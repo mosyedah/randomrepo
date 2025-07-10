@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AVL Tree Rotations Explained</title>
+    <!-- Tailwind CSS for easy styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles for better aesthetics and highlighting */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8; /* Light gray background */
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .section-heading {
+            font-size: 2.25rem; /* text-4xl */
+            font-weight: 700; /* font-bold */
+            color: #1a202c; /* gray-900 */
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        .sub-heading {
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: 600; /* font-semibold */
+            color: #2d3748; /* gray-800 */
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+        .code-block {
+            background-color: #e2e8f0; /* gray-200 */
+            padding: 1rem;
+            border-radius: 0.5rem; /* rounded-lg */
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            font-size: 0.9rem;
+            color: #2d3748; /* gray-800 */
+            margin-bottom: 1rem;
+            overflow-x: auto; /* Enable horizontal scrolling for long lines */
+        }
+        .explanation-box {
+            background-color: #f7fafc; /* gray-50 */
+            border-left: 4px solid #4299e1; /* blue-500 border */
+            padding: 1rem;
+            border-radius: 0.5rem; /* rounded-lg */
+            margin-bottom: 1.5rem;
+        }
+        .svg-container {
+            width: 100%;
+            height: 300px; /* Fixed height for SVG area */
+            border: 1px solid #cbd5e0; /* gray-300 border */
+            border-radius: 0.5rem; /* rounded-lg */
+            margin-bottom: 1.5rem;
+            background-color: #ffffff;
+            overflow: hidden; /* Ensure content doesn't spill outside */
+        }
+        /* SVG element styling */
+        .node-circle {
+            fill: #63b3ed; /* Blue-500 */
+            stroke: #2b6cb0; /* Blue-700 */
+            stroke-width: 2;
+            transition: all 0.3s ease-in-out; /* Smooth transitions for highlighting */
+        }
+        .node-text {
+            fill: #ffffff;
+            font-weight: bold;
+            text-anchor: middle; /* Center text horizontally */
+            dominant-baseline: middle; /* Center text vertically */
+            pointer-events: none; /* Allow clicks to pass through text to circle */
+        }
+        .node-line {
+            stroke: #4a5568; /* Gray-700 */
+            stroke-width: 2;
+            transition: all 0.3s ease-in-out; /* Smooth transitions for highlighting */
+        }
+        /* Highlighting styles */
+        .highlight-node {
+            fill: #f6ad55; /* Orange-400 */
+            stroke: #dd6b20; /* Orange-600 */
+            stroke-width: 3;
+        }
+        .highlight-line {
+            stroke: #e53e3e; /* Red-600 */
+            stroke-width: 3;
+        }
+        .highlight-text {
+            fill: #e53e3e; /* Red-600 */
+        }
+        /* Button styling */
+        .button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .button-primary {
+            background-color: #4299e1; /* Blue-500 */
+            color: #ffffff;
+        }
+        .button-primary:hover {
+            background-color: #3182ce; /* Blue-600 */
+            transform: translateY(-1px); /* Slight lift on hover */
+        }
+        .button-secondary {
+            background-color: #e2e8f0; /* Gray-200 */
+            color: #2d3748;
+            margin-left: 1rem;
+        }
+        .button-secondary:hover {
+            background-color: #cbd5e0; /* Gray-300 */
+            transform: translateY(-1px);
+        }
+        .button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+    </style>
+</head>
+<body class="p-4">
+    <div class="container">
+        <h1 class="section-heading">Understanding AVL Tree Rotations</h1>
+
+        <p class="text-center text-lg mb-8">
+            Welcome, beginner! This page will guide you step-by-step through the two main types of AVL tree rotations:
+            Right Rotation (for LL imbalance) and Left Rotation (for RR imbalance).
+            Click the "Next Step" button to see how the tree transforms!
+        </p>
+
+        <!-- Right Rotation Section -->
+        <div class="mb-12 p-6 bg-blue-50 rounded-lg shadow-md">
+            <h2 class="sub-heading">Right Rotation (LL Imbalance)</h2>
+            <p class="mb-4">
+                A Right Rotation is performed when an AVL tree becomes imbalanced on the "left side of the left child" (LL imbalance).
+                This usually happens after inserting a node into the left subtree of the left child of an already balanced node,
+                making the left subtree significantly taller than the right subtree.
+                The goal is to rotate nodes clockwise to restore balance.
+            </p>
+
+            <div class="code-block" id="right-rotation-code-line">
+                <!-- Code line will be inserted here by JavaScript -->
+            </div>
+            <div class="explanation-box" id="right-rotation-explanation">
+                <!-- Explanation will be inserted here by JavaScript -->
+            </div>
+            <div class="svg-container" id="right-rotation-svg-container">
+                <svg id="right-rotation-svg" width="100%" height="100%"></svg>
+            </div>
+            <div class="flex justify-center mt-4">
+                <button id="right-rotation-next-btn" class="button button-primary">Next Step</button>
+                <button id="right-rotation-reset-btn" class="button button-secondary">Reset</button>
+            </div>
+        </div>
+
+        <!-- Left Rotation Section -->
+        <div class="mb-12 p-6 bg-green-50 rounded-lg shadow-md">
+            <h2 class="sub-heading">Left Rotation (RR Imbalance)</h2>
+            <p class="mb-4">
+                A Left Rotation is performed when an AVL tree becomes imbalanced on the "right side of the right child" (RR imbalance).
+                This typically occurs after inserting a node into the right subtree of the right child of an already balanced node,
+                causing the right subtree to become much taller than the left subtree.
+                The purpose is to rotate nodes counter-clockwise to bring the tree back into balance.
+            </p>
+
+            <div class="code-block" id="left-rotation-code-line">
+                <!-- Code line will be inserted here by JavaScript -->
+            </div>
+            <div class="explanation-box" id="left-rotation-explanation">
+                <!-- Explanation will be inserted here by JavaScript -->
+            </div>
+            <div class="svg-container" id="left-rotation-svg-container">
+                <svg id="left-rotation-svg" width="100%" height="100%"></svg>
+            </div>
+            <div class="flex justify-center mt-4">
+                <button id="left-rotation-next-btn" class="button button-primary">Next Step</button>
+                <button id="left-rotation-reset-btn" class="button button-secondary">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Node class to represent a node in the AVL tree
+        class Node {
+            constructor(value) {
+                this.value = value;
+                this.left = null;
+                this.right = null;
+                this.height = 1; // Height of the node's subtree (used in a real AVL implementation)
+            }
+        }
+
+        // --- Tree Drawing Utility ---
+        const NODE_RADIUS = 25; // Radius of the circle representing a node
+        const HORIZONTAL_SPACING = 50; // Minimum horizontal space between sibling nodes
+        const VERTICAL_SPACING = 70;  // Vertical space between levels of the tree
+
+        /**
+         * Recursively calculates the x, y coordinates and subtree width for each node.
+         * This helps in positioning nodes correctly to avoid overlaps and center the tree.
+         * @param {Node} node The current node to position.
+         * @param {number} x The current x-coordinate for the left edge of the subtree.
+         * @param {number} y The current y-coordinate (depth) for the current node.
+         * @returns {number} The total width occupied by the subtree rooted at this node.
+         */
+        function calculateNodePositions(node, x, y) {
+            if (!node) return 0;
+
+            // Calculate width of left subtree
+            let leftWidth = calculateNodePositions(node.left, x, y + VERTICAL_SPACING);
+            
+            // Set current node's x and y based on left subtree's width
+            node.x = x + leftWidth;
+            node.y = y;
+
+            // Calculate width of right subtree
+            let rightWidth = calculateNodePositions(node.right, node.x + HORIZONTAL_SPACING, y + VERTICAL_SPACING);
+
+            // Return total width of this subtree
+            return leftWidth + HORIZONTAL_SPACING + rightWidth;
+        }
+
+        /**
+         * Draws the AVL tree on the specified SVG element.
+         * It clears previous drawings, calculates positions, and then draws nodes and edges.
+         * @param {Node} root The root of the tree to draw.
+         * @param {string} svgId The ID of the SVG element where the tree will be drawn.
+         * @param {Array<number>} highlightNodes An array of node values to highlight (e.g., [20, 30]).
+         * @param {Array<string>} highlightPointers An array of pointer IDs to highlight (e.g., ['line-parentValue-childValue']).
+         */
+        function drawTree(root, svgId, highlightNodes = [], highlightPointers = []) {
+            const svg = document.getElementById(svgId);
+            if (!svg) return;
+
+            // Clear any previously drawn elements in the SVG
+            while (svg.firstChild) {
+                svg.removeChild(svg.firstChild);
+            }
+
+            if (!root) return; // If no root, nothing to draw
+
+            // Create a deep copy of the tree to add position (x, y) properties without modifying original data
+            let tempRoot = JSON.parse(JSON.stringify(root)); 
+            
+            // Calculate initial positions. Start drawing a bit lower to give space for root.
+            calculateNodePositions(tempRoot, 0, NODE_RADIUS * 2); 
+
+            // Find min/max x to determine the overall width of the tree and center it
+            let minX = Infinity, maxX = -Infinity;
+            let nodesToDraw = []; // Collect all nodes for drawing
+            let queue = [tempRoot]; // Use a queue for a breadth-first traversal to collect nodes
+            while (queue.length > 0) {
+                let node = queue.shift();
+                if (node) {
+                    nodesToDraw.push(node);
+                    minX = Math.min(minX, node.x);
+                    maxX = Math.max(maxX, node.x);
+                    if (node.left) queue.push(node.left);
+                    if (node.right) queue.push(node.right);
+                }
+            }
+
+            const svgWidth = svg.clientWidth; // Get the actual width of the SVG container
+            // Calculate offset to center the tree horizontally within the SVG container
+            const offsetX = (svgWidth - (maxX - minX)) / 2 - minX; 
+
+            // --- Draw lines (edges) first so nodes appear on top ---
+            function drawEdges(node) {
+                if (!node) return;
+
+                // Draw line to left child
+                if (node.left) {
+                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("x1", node.x + offsetX);
+                    line.setAttribute("y1", node.y + NODE_RADIUS); // Start from bottom of parent circle
+                    line.setAttribute("x2", node.left.x + offsetX);
+                    line.setAttribute("y2", node.left.y - NODE_RADIUS); // End at top of child circle
+                    // Apply highlighting class if this pointer is in the highlight list
+                    line.setAttribute("class", `node-line ${highlightPointers.includes(`line-${node.value}-${node.left.value}`) ? 'highlight-line' : ''}`);
+                    line.setAttribute("id", `line-${node.value}-${node.left.value}`);
+                    svg.appendChild(line);
+                    drawEdges(node.left); // Recursively draw edges for left subtree
+                }
+                // Draw line to right child
+                if (node.right) {
+                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                    line.setAttribute("x1", node.x + offsetX);
+                    line.setAttribute("y1", node.y + NODE_RADIUS);
+                    line.setAttribute("x2", node.right.x + offsetX);
+                    line.setAttribute("y2", node.right.y - NODE_RADIUS);
+                    // Apply highlighting class if this pointer is in the highlight list
+                    line.setAttribute("class", `node-line ${highlightPointers.includes(`line-${node.value}-${node.right.value}`) ? 'highlight-line' : ''}`);
+                    line.setAttribute("id", `line-${node.value}-${node.right.value}`);
+                    svg.appendChild(line);
+                    drawEdges(node.right); // Recursively draw edges for right subtree
+                }
+            }
+            drawEdges(tempRoot); // Start drawing edges from the temporary root
+
+            // --- Draw nodes (circles and text) ---
+            nodesToDraw.forEach(node => {
+                // Draw circle for the node
+                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                circle.setAttribute("cx", node.x + offsetX);
+                circle.setAttribute("cy", node.y);
+                circle.setAttribute("r", NODE_RADIUS);
+                // Apply highlighting class if this node's value is in the highlight list
+                circle.setAttribute("class", `node-circle ${highlightNodes.includes(node.value) ? 'highlight-node' : ''}`);
+                circle.setAttribute("id", `node-${node.value}`);
+                svg.appendChild(circle);
+
+                // Draw text (node value)
+                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                text.setAttribute("x", node.x + offsetX);
+                text.setAttribute("y", node.y);
+                text.textContent = node.value;
+                // Apply highlighting class if this node's value is in the highlight list
+                text.setAttribute("class", `node-text ${highlightNodes.includes(node.value) ? 'highlight-text' : ''}`);
+                text.setAttribute("id", `text-${node.value}`);
+                svg.appendChild(text);
+            });
+        }
+
+        // --- Rotation Logic and Steps Definitions ---
+
+        // Helper function to create a deep copy of a Node structure.
+        // This is crucial because we modify the tree structure for each step's visualization
+        // without altering the original initial tree.
+        function deepCopyNode(node) {
+            if (!node) return null;
+            const newNode = new Node(node.value);
+            newNode.left = deepCopyNode(node.left);
+            newNode.right = deepCopyNode(node.right);
+            newNode.height = node.height; // Copy height as well
+            return newNode;
+        }
+
+        // Initial tree for Right Rotation (LL Imbalance demonstration)
+        // This tree is designed to be imbalanced on the left-left side.
+        //       30 (root)
+        //      /
+        //     20 (newRoot)
+        //    /
+        //   10
+        const initialRightTree = new Node(30);
+        initialRightTree.left = new Node(20);
+        initialRightTree.left.left = new Node(10);
+        // Manually setting heights for this example. In a real AVL tree, these would be calculated.
+        initialRightTree.left.left.height = 1;
+        initialRightTree.left.height = 2;
+        initialRightTree.height = 3;
+
+        // Define each step of the Right Rotation process
+        const rightRotationSteps = [
+            {
+                codeLine: "function rightRotate(root):",
+                explanation: "We are starting the right rotation process. 'root' is the node that is currently out of balance (value: 30). This imbalance is due to a new node being inserted into its left-left subtree.",
+                treeState: deepCopyNode(initialRightTree), // Show initial tree
+                highlightNodes: [30], // Highlight the root node
+                highlightPointers: []
+            },
+            {
+                codeLine: "  let newRoot = root.left;",
+                explanation: "First, we identify the 'newRoot' of this subtree. This will be the left child of our current 'root' (value: 20). This node will move up to become the new top of this section of the tree after rotation.",
+                treeState: (() => {
+                    // Tree state remains the same for drawing, just highlighting changes
+                    const tree = deepCopyNode(initialRightTree);
+                    return tree;
+                })(),
+                highlightNodes: [20], // Highlight the node that will become the new root
+                highlightPointers: ['line-30-20'] // Highlight the pointer from 30 to 20
+            },
+            {
+                codeLine: "  let tempSubtree = newRoot.right;",
+                explanation: "Next, we need to temporarily store the right child of our 'newRoot' (value: 20). This is called 'tempSubtree'. In this specific example, it's empty (null), but it's crucial for cases where this subtree exists. It will be re-attached later.",
+                treeState: (() => {
+                    const tree = deepCopyNode(initialRightTree);
+                    return tree;
+                })(),
+                highlightNodes: [20], // Still highlighting newRoot
+                highlightPointers: [] // No specific pointer to highlight for null subtree
+            },
+            {
+                codeLine: "  newRoot.right = root;",
+                explanation: "Now, we perform the main rotation step! The 'newRoot' (value: 20) takes the original 'root' (value: 30) as its new right child. Imagine 20 swinging up and 30 swinging down and to its right. This is a key pointer change!",
+                treeState: (() => {
+                    const tree = deepCopyNode(initialRightTree); // Get initial state
+                    const newRoot = tree.left; // Node 20
+                    const root = tree; // Node 30
+                    
+                    // Perform the conceptual pointer change for visualization
+                    newRoot.right = root; // 20's right now points to 30
+                    root.left = null; // Temporarily nullify 30's left for clarity of this specific pointer change
+                    
+                    return newRoot; // Return 20 as the conceptual new root for drawing this step
+                })(),
+                highlightNodes: [20, 30], // Highlight both nodes involved in the main swap
+                highlightPointers: ['line-20-30'] // Highlight the newly formed pointer from 20 to 30
+            },
+            {
+                codeLine: "  root.left = tempSubtree;",
+                explanation: "The original 'root' (value: 30) needs a new left child. We assign it the 'tempSubtree' we saved earlier. Since 'tempSubtree' was null in this example, 30's left child becomes null. If 'tempSubtree' had nodes, they would be attached here.",
+                treeState: (() => {
+                    const tree = deepCopyNode(initialRightTree);
+                    const newRoot = tree.left; // Node 20
+                    const root = tree; // Node 30
+                    const tempSubtree = newRoot.right; // This was null in our initial tree
+                    
+                    newRoot.right = root; // Re-establish 20 -> 30 link
+                    root.left = tempSubtree; // 30's left becomes null (or whatever tempSubtree was)
+                    
+                    return newRoot;
+                })(),
+                highlightNodes: [30], // Highlight 30 as its left pointer is changing
+                highlightPointers: [] // No specific line to highlight if it points to null
+            },
+            {
+                codeLine: "  // Update heights of root and newRoot",
+                explanation: "After the rotation, the heights of the affected nodes (the original 'root' (30) and the 'newRoot' (20)) need to be recalculated. This is crucial to maintain AVL properties and ensure the tree's balance factor can be correctly checked for future operations.",
+                treeState: (() => {
+                    const tree = deepCopyNode(initialRightTree);
+                    const newRoot = tree.left; // Node 20
+                    const root = tree; // Node 30
+                    const tempSubtree = newRoot.right; // null
+                    
+                    newRoot.right = root;
+                    root.left = tempSubtree;
+
+                    // Simulate height update for the new structure
+                    root.height = 1; // 30 is now a leaf (or has a smaller subtree)
+                    newRoot.height = 2; // 20 now has 10 (left) and 30 (right), so its height is 2
+                    return newRoot;
+                })(),
+                highlightNodes: [20, 30], // Highlight both nodes whose heights are updated
+                highlightPointers: []
+            },
+            {
+                codeLine: "  return newRoot;",
+                explanation: "Finally, the 'newRoot' (value: 20) is returned. This node is now the root of the balanced subtree, replacing the original 'root' (value: 30). The tree is now balanced! This new root (20) will be linked to its parent in the larger tree.",
+                treeState: (() => {
+                    const tree = deepCopyNode(initialRightTree);
+                    const newRoot = tree.left; // Node 20
+                    const root = tree; // Node 30
+                    const tempSubtree = newRoot.right; // null
+                    
+                    newRoot.right = root;
+                    root.left = tempSubtree;
+                    root.height = 1;
+                    newRoot.height = 2;
+                    return newRoot; // This is the final balanced subtree
+                })(),
+                highlightNodes: [20], // Highlight the final new root
+                highlightPointers: []
+            }
+        ];
+
+        // Initial tree for Left Rotation (RR Imbalance demonstration)
+        // This tree is designed to be imbalanced on the right-right side.
+        //   10 (root)
+        //    \
+        //     20 (newRoot)
+        //      \
+        //       30
+        const initialLeftTree = new Node(10);
+        initialLeftTree.right = new Node(20);
+        initialLeftTree.right.right = new Node(30);
+        // Manually setting heights for this example.
+        initialLeftTree.right.right.height = 1;
+        initialLeftTree.right.height = 2;
+        initialLeftTree.height = 3;
+
+        // Define each step of the Left Rotation process
+        const leftRotationSteps = [
+            {
+                codeLine: "function leftRotate(root):",
+                explanation: "We are starting the left rotation process. 'root' is the node that is currently out of balance (value: 10). This imbalance is due to a new node being inserted into its right-right subtree.",
+                treeState: deepCopyNode(initialLeftTree),
+                highlightNodes: [10],
+                highlightPointers: []
+            },
+            {
+                codeLine: "  let newRoot = root.right;",
+                explanation: "First, we identify the 'newRoot' of this subtree. This will be the right child of our current 'root' (value: 20). This node will move up to become the new top of this section of the tree after rotation.",
+                treeState: (() => {
+                    const tree = deepCopyNode(initialLeftTree);
+                    return tree;
+                })(),
+                highlightNodes: [20],
+                highlightPointers: ['line-10-20']
+            },
+            {
+                codeLine: "  let tempSubtree = newRoot.left;",
+                explanation: "Next, we need to temporarily store the left child of our 'newRoot' (value: 20). This is called 'tempSubtree'. In this specific example, it's empty (null), but it's crucial for cases where this subtree exists. It will be re-attached later.",
+                treeState: (() => {
+                    const tree = deepCopyNode(initialLeftTree);
+                    return tree;
+                })(),
+                highlightNodes: [20],
+                highlightPointers: []
+            },
+            {
+                codeLine: "  newRoot.left = root;",
+                explanation: "Now, we perform the main rotation step! The 'newRoot' (value: 20) takes the original 'root' (value: 10) as its new left child. Imagine 20 swinging up and 10 swinging down and to its left. This is a key pointer change!",
+                treeState: (() => {
+                    const tree = deepCopyNode(initialLeftTree);
+                    const newRoot = tree.right; // Node 20
+                    const root = tree; // Node 10
+                    
+                    newRoot.left = root; // 20's left now points to 10
+                    root.right = null; // Temporarily nullify 10's right for clarity
+                    
+                    return newRoot;
+                })(),
+                highlightNodes: [20, 10],
+                highlightPointers: ['line-20-10']
+            },
+            {
+                codeLine: "  root.right = tempSubtree;",
+                explanation: "The original 'root' (value: 10) needs a new right child. We assign it the 'tempSubtree' we saved earlier. Since 'tempSubtree' was null in this example, 10's right child becomes null. If 'tempSubtree' had nodes, they would be attached here.",
+                treeState: (() => {
+                    const tree = deepCopyNode(initialLeftTree);
+                    const newRoot = tree.right; // Node 20
+                    const root = tree; // Node 10
+                    const tempSubtree = newRoot.left; // null
+                    
+                    newRoot.left = root;
+                    root.right = tempSubtree; // 10's right becomes null
+                    
+                    return newRoot;
+                })(),
+                highlightNodes: [10],
+                highlightPointers: []
+            },
+            {
+                codeLine: "  // Update heights of root and newRoot",
+                explanation: "After the rotation, the heights of the affected nodes (the original 'root' (10) and the 'newRoot' (20)) need to be recalculated. This is crucial to maintain AVL properties and ensure the tree's balance factor can be correctly checked for future operations.",
+                treeState: (() => {
+                    const tree = deepCopyNode(initialLeftTree);
+                    const newRoot = tree.right; // Node 20
+                    const root = tree; // Node 10
+                    const tempSubtree = newRoot.left; // null
+                    
+                    newRoot.left = root;
+                    root.right = tempSubtree;
+
+                    // Simulate height update
+                    root.height = 1; // 10 is now a leaf
+                    newRoot.height = 2; // 20 now has 10 (left) and 30 (right), so its height is 2
+                    return newRoot;
+                })(),
+                highlightNodes: [10, 20],
+                highlightPointers: []
+            },
+            {
+                codeLine: "  return newRoot;",
+                explanation: "Finally, the 'newRoot' (value: 20) is returned. This node is now the root of the balanced subtree, replacing the original 'root' (value: 10). The tree is now balanced! This new root (20) will be linked to its parent in the larger tree.",
+                treeState: (() => {
+                    const tree = deepCopyNode(initialLeftTree);
+                    const newRoot = tree.right; // Node 20
+                    const root = tree; // Node 10
+                    const tempSubtree = newRoot.left; // null
+                    
+                    newRoot.left = root;
+                    root.right = tempSubtree;
+                    root.height = 1;
+                    newRoot.height = 2;
+                    return newRoot; // This is the final balanced subtree
+                })(),
+                highlightNodes: [20],
+                highlightPointers: []
+            }
+        ];
+
+        let currentRightStepIndex = 0; // Tracks the current step for Right Rotation
+        let currentLeftStepIndex = 0;  // Tracks the current step for Left Rotation
+
+        // --- Update Display Function ---
+
+        /**
+         * Updates the UI elements (code, explanation, tree diagram) for a given rotation type.
+         * @param {'right'|'left'} type The type of rotation ('right' or 'left').
+         */
+        function updateDisplay(type) {
+            let step, codeLineEl, explanationEl, nextBtn, resetBtn, svgId;
+            let stepsArray, currentIndex;
+
+            // Determine which rotation's data and elements to use
+            if (type === 'right') {
+                stepsArray = rightRotationSteps;
+                currentIndex = currentRightStepIndex;
+                codeLineEl = document.getElementById('right-rotation-code-line');
+                explanationEl = document.getElementById('right-rotation-explanation');
+                nextBtn = document.getElementById('right-rotation-next-btn');
+                resetBtn = document.getElementById('right-rotation-reset-btn');
+                svgId = 'right-rotation-svg';
+            } else { // type === 'left'
+                stepsArray = leftRotationSteps;
+                currentIndex = currentLeftStepIndex;
+                codeLineEl = document.getElementById('left-rotation-code-line');
+                explanationEl = document.getElementById('left-rotation-explanation');
+                nextBtn = document.getElementById('left-rotation-next-btn');
+                resetBtn = document.getElementById('left-rotation-reset-btn');
+                svgId = 'left-rotation-svg';
+            }
+
+            // Get the current step's data
+            step = stepsArray[currentIndex];
+
+            // Update text content
+            codeLineEl.textContent = step.codeLine;
+            explanationEl.textContent = step.explanation;
+
+            // Draw the tree for the current step with appropriate highlighting
+            drawTree(step.treeState, svgId, step.highlightNodes, step.highlightPointers);
+
+            // Enable/disable the "Next Step" button based on whether there are more steps
+            if (currentIndex >= stepsArray.length - 1) {
+                nextBtn.disabled = true; // Disable if at the last step
+            } else {
+                nextBtn.disabled = false; // Enable otherwise
+            }
+        }
+
+        // --- Event Listeners ---
+        // Ensure the DOM is fully loaded before trying to access elements
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize the display for both rotations when the page loads
+            updateDisplay('right');
+            updateDisplay('left');
+
+            // Event listener for Right Rotation "Next Step" button
+            document.getElementById('right-rotation-next-btn').addEventListener('click', () => {
+                if (currentRightStepIndex < rightRotationSteps.length - 1) {
+                    currentRightStepIndex++; // Move to the next step
+                    updateDisplay('right'); // Update display for right rotation
+                }
+            });
+
+            // Event listener for Right Rotation "Reset" button
+            document.getElementById('right-rotation-reset-btn').addEventListener('click', () => {
+                currentRightStepIndex = 0; // Reset to the first step
+                updateDisplay('right'); // Update display for right rotation
+            });
+
+            // Event listener for Left Rotation "Next Step" button
+            document.getElementById('left-rotation-next-btn').addEventListener('click', () => {
+                if (currentLeftStepIndex < leftRotationSteps.length - 1) {
+                    currentLeftStepIndex++; // Move to the next step
+                    updateDisplay('left'); // Update display for left rotation
+                }
+            });
+
+            // Event listener for Left Rotation "Reset" button
+            document.getElementById('left-rotation-reset-btn').addEventListener('click', () => {
+                currentLeftStepIndex = 0; // Reset to the first step
+                updateDisplay('left'); // Update display for left rotation
+            });
+        });
+
+        // Optional: Handle window resize to redraw SVG if necessary for responsiveness.
+        // This ensures the tree remains centered and scaled correctly if the browser window changes size.
+        window.addEventListener('resize', () => {
+            updateDisplay('right');
+            updateDisplay('left');
+        });
+
+    </script>
+</body>
+</html>
