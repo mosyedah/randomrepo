@@ -1,678 +1,705 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AVL Tree Rotations Explained</title>
-    <!-- Tailwind CSS for easy styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Janvi Vaghani - Resume</title>
+    <!-- Essential Cropper.js CSS and JS files -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
     <style>
-        /* Custom styles for better aesthetics and highlighting */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f0f4f8; /* Light gray background */
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        /* Popup Styles */
+        #instructionPopup {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black overlay */
+            display: none; /* Default hidden, controlled by JS */
+            justify-content: center;
+            align-items: center;
+            z-index: 100000; /* Even higher z-index for instruction popup */
+            backdrop-filter: blur(5px); /* Optional: Adds a nice blur effect */
+        }
+
+        .popup-content {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 600px; /* Limit maximum width */
+            position: relative;
+            text-align: left;
+            animation: fadeInScale 0.3s ease-out forwards; /* Simple animation */
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .popup-content h2 {
+            color: #0d47a1;
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            border-bottom: none; /* Override resume h2 style */
+            padding-bottom: 0; /* Override resume h2 style */
+        }
+
+        .popup-content h3 {
+            color: #1976d2;
+            font-size: 18px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        .popup-content p {
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 10px;
+        }
+
+        .popup-content ul {
+            list-style: disc;
+            margin-left: 25px;
+            margin-bottom: 15px;
+            font-size: 15px;
+        }
+
+        .popup-content ul li {
+            margin-bottom: 8px;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 30px;
+            color: #aaa;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-button:hover {
             color: #333;
-            line-height: 1.6;
+        }
+
+        .stylish-button {
+            background-color: #0d47a1;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        .stylish-button:hover {
+            background-color: #1976d2;
+            transform: translateY(-2px);
+        }
+
+        /* Styles for clip-path handles - NOW VISIBLE BY DEFAULT IN CSS */
+        .clip-path-handle {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-color: rgba(255, 255, 0, 0.5); /* Yellow for visibility */
+            border: 1px solid yellow;
+            border-radius: 50%;
+            cursor: grab;
+            z-index: 10; /* Higher than resume content, lower than modals */
+            transform: translate(-50%, -50%); /* Center the handle on the exact point */
+        }
+        .clip-path-handle:active {
+            cursor: grabbing;
+        }
+
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+                margin: 0;
+                background: white;
+            }
+            .container {
+                box-shadow: none !important;
+                border: none;
+            }
+            .header {
+                clip-path: none;
+                background: #0d47a1 !important;
+                color: white !important;
+                padding-bottom: 20px;
+            }
+            .left {
+                background: #f4f7fb !important;
+                padding-top: 40px !important;
+            }
+            .section {
+                box-shadow: none !important;
+                border: 1px solid #ccc;
+                page-break-inside: avoid;
+            }
+            /* Hide handles and file input during print */
+            .clip-path-handle, #imageUpload {
+                display: none !important;
+            }
+        }
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background: #f0f2f5;
+            color: #333;
+        }
+        .header {
+            background: #0d47a1;
+            color: white;
+            padding: 40px 40px 100px;
+            position: relative;
+            /* clip-path will be set by JS or loaded from localStorage */
+            clip-path: polygon(0 0, 100% 0, 100% 85%, 32% 65%, 0 140px); /* Default for first load */
+            z-index: 2; /* Keep z-index for header relative to its siblings */
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+        }
+        .header p {
+            margin: 8px 0 0;
+            font-size: 14px;
+            color: #cfd8dc;
         }
         .container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background-color: #ffffff;
-            border-radius: 1rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            display: grid;
+            grid-template-columns: 32% 68%;
+            max-width: 1122px;
+            margin: 0 auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            box-sizing: border-box;
         }
-        .section-heading {
-            font-size: 2.25rem; /* text-4xl */
-            font-weight: 700; /* font-bold */
-            color: #1a202c; /* gray-900 */
-            margin-bottom: 1.5rem;
-            text-align: center;
+        .left {
+            background: #f4f7fb;
+            padding: 60px 30px 40px;
+            position: relative;
+            z-index: 1;
         }
-        .sub-heading {
-            font-size: 1.5rem; /* text-2xl */
-            font-weight: 600; /* font-semibold */
-            color: #2d3748; /* gray-800 */
-            margin-top: 2rem;
-            margin-bottom: 1rem;
+        .left::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: #f4f7fb;
+            z-index: -1;
         }
-        .code-block {
-            background-color: #e2e8f0; /* gray-200 */
-            padding: 1rem;
-            border-radius: 0.5rem; /* rounded-lg */
-            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-            font-size: 0.9rem;
-            color: #2d3748; /* gray-800 */
-            margin-bottom: 1rem;
-            overflow-x: auto; /* Enable horizontal scrolling for long lines */
-        }
-        .explanation-box {
-            background-color: #f7fafc; /* gray-50 */
-            border-left: 4px solid #4299e1; /* blue-500 border */
-            padding: 1rem;
-            border-radius: 0.5rem; /* rounded-lg */
-            margin-bottom: 1.5rem;
-        }
-        .svg-container {
-            width: 100%;
-            height: 300px; /* Fixed height for SVG area */
-            border: 1px solid #cbd5e0; /* gray-300 border */
-            border-radius: 0.5rem; /* rounded-lg */
-            margin-bottom: 1.5rem;
-            background-color: #ffffff;
-            overflow: hidden; /* Ensure content doesn't spill outside */
-        }
-        /* SVG element styling */
-        .node-circle {
-            fill: #63b3ed; /* Blue-500 */
-            stroke: #2b6cb0; /* Blue-700 */
-            stroke-width: 2;
-            transition: all 0.3s ease-in-out; /* Smooth transitions for highlighting */
-        }
-        .node-text {
-            fill: #ffffff;
-            font-weight: bold;
-            text-anchor: middle; /* Center text horizontally */
-            dominant-baseline: middle; /* Center text vertically */
-            pointer-events: none; /* Allow clicks to pass through text to circle */
-        }
-        .node-line {
-            stroke: #4a5568; /* Gray-700 */
-            stroke-width: 2;
-            transition: all 0.3s ease-in-out; /* Smooth transitions for highlighting */
-        }
-        /* Highlighting styles */
-        .highlight-node {
-            fill: #f6ad55; /* Orange-400 */
-            stroke: #dd6b20; /* Orange-600 */
-            stroke-width: 3;
-        }
-        .highlight-line {
-            stroke: #e53e3e; /* Red-600 */
-            stroke-width: 3;
-        }
-        .highlight-text {
-            fill: #e53e3e; /* Red-600 */
-        }
-        /* Button styling */
-        .button {
-            padding: 0.75rem 1.5rem;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s, transform 0.1s;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-        .button-primary {
-            background-color: #4299e1; /* Blue-500 */
-            color: #ffffff;
-        }
-        .button-primary:hover {
-            background-color: #3182ce; /* Blue-600 */
-            transform: translateY(-1px); /* Slight lift on hover */
-        }
-        .button-secondary {
-            background-color: #e2e8f0; /* Gray-200 */
-            color: #2d3748;
-            margin-left: 1rem;
-        }
-        .button-secondary:hover {
-            background-color: #cbd5e0; /* Gray-300 */
-            transform: translateY(-1px);
-        }
-        .button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
+        .left .section {
+            background: none;
+            padding: 0;
+            border: none;
             box-shadow: none;
+        }
+        .left .section + .section {
+            margin-top: 20px;
+            padding-top: 12px;
+            border-top: 1px solid #ccc;
+        }
+        .right {
+            background: #ffffff;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .section {
+            background: #ffffff;
+            padding: 16px 20px;
+            border-radius: 8px;
+            border-left: 4px solid #1976d2;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+            page-break-inside: avoid;
+        }
+        h2 {
+            font-size: 15px;
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #1976d2;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 4px;
+        }
+
+        .profile-pic {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-image: url('https://placehold.co/300x300'); /* Default image */
+            background-size: cover;
+            background-position: center;
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            border: 4px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            cursor: pointer; /* Indicate it's clickable */
+        }
+
+        ul {
+            padding-left: 18px;
+            margin: 0;
+            font-size: 14px;
+        }
+        ul li {
+            margin-bottom: 6px;
+        }
+        p {
+            font-size: 14px;
+            margin: 0 0 8px;
+            line-height: 1.6;
+        }
+        .job-title {
+            font-weight: 600;
+        }
+        .company {
+            font-style: italic;
+            font-size: 13px;
+            margin-bottom: 6px;
+            color: #666;
+        }
+
+        /* Additional CSS for Cropper Modal for better appearance */
+        #cropModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none; /* Default hidden, controlled by JS */
+            justify-content: center;
+            align-items: center;
+            z-index: 100001 !important; /* EVEN HIGHER Z-INDEX for cropping modal */
+        }
+
+        #cropModal > div { /* This targets the white content box inside the modal */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px; /* Spacing between image and buttons */
+            max-height: 90vh; /* Prevent the modal from getting too tall on smaller screens */
+            overflow-y: auto; /* Allow scrolling if content exceeds height */
+        }
+
+        #cropImage {
+            display: block; /* Important for Cropper.js to work correctly */
+            max-width: 100%; /* Ensure the image fits within the modal */
+            /* Cropper.js will style this further, but these are good defaults */
+        }
+
+        /* Optional: Style for the buttons within the modal */
+        #cropModal button {
+            background-color: #1976d2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+
+        #cropModal button:hover {
+            background-color: #0d47a1;
+        }
+
+        #cropModal button#cancelCropButton {
+            background-color: #e0e0e0;
+            color: #333;
+        }
+
+        #cropModal button#cancelCropButton:hover {
+            background-color: #bdbdbd;
         }
     </style>
 </head>
-<body class="p-4">
+<body>
+    <div class="header" id="resumeHeader">
+        <h1>Anu Prasannakumar</h1>
+        <div class="profile-pic" id="profilePic"></div>
+        <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+
+        <img id="imageToCrop" style="max-width: 100%; display: none;">
+
+        <!-- Clip-path handles remain in the header as they are part of its visual design -->
+        <div class="clip-path-handle" id="handle1"></div>
+        <div class="clip-path-handle" id="handle2"></div>
+        <div class="clip-path-handle" id="handle3"></div>
+    </div>
     <div class="container">
-        <h1 class="section-heading">Understanding AVL Tree Rotations</h1>
-
-        <p class="text-center text-lg mb-8">
-            Welcome, beginner! This page will guide you step-by-step through the two main types of AVL tree rotations:
-            Right Rotation (for LL imbalance) and Left Rotation (for RR imbalance).
-            Click the "Next Step" button to see how the tree transforms!
-        </p>
-
-        <!-- Right Rotation Section -->
-        <div class="mb-12 p-6 bg-blue-50 rounded-lg shadow-md">
-            <h2 class="sub-heading">Right Rotation (LL Imbalance)</h2>
-            <p class="mb-4">
-                A Right Rotation is performed when an AVL tree becomes imbalanced on the "left side of the left child" (LL imbalance).
-                This usually happens after inserting a node into the left subtree of the left child of an already balanced node,
-                making the left subtree significantly taller than the right subtree.
-                The goal is to rotate nodes clockwise to restore balance.
-            </p>
-
-            <div class="code-block" id="right-rotation-code-line">
-                <!-- Code line will be inserted here by JavaScript -->
+        <div class="left">
+            <div class="section">
+                <h2>Contact</h2>
+                <p>📍 Bengaluru, Karnataka</p>
+                <p>📞 +91-7736385086</p>
+                <p>✉️ anubee3120@gmail.com</p>
+                <p>🎂 3 January 2000</p>
             </div>
-            <div class="explanation-box" id="right-rotation-explanation">
-                <!-- Explanation will be inserted here by JavaScript -->
+            <div class="section">
+                <h2>Skills</h2>
+                <ul>
+                    <li>Manual, Regression, Smoke Testing</li>
+                    <li>JIRA, Bug Tracking</li>
+                    <li>Agile/Scrum Process</li>
+                    <li>Test Documentation</li>
+                    <li>SQL (Basic)</li>
+                    <li>Core Java</li>
+                    <li>Familiar with AWS fundamentals and commonly used services </li>
+                    <li>Familiar with Linux OS</li>
+                    <li>Fundamental Understanding of Networking </li>
+                </ul>
             </div>
-            <div class="svg-container" id="right-rotation-svg-container">
-                <svg id="right-rotation-svg" width="100%" height="100%"></svg>
+            <div class="section">
+                <h2>Education</h2>
+                <p><strong>B.E. in Computer Science</strong><br>Anna University, Chennai – 2022</p>
             </div>
-            <div class="flex justify-center mt-4">
-                <button id="right-rotation-next-btn" class="button button-primary">Next Step</button>
-                <button id="right-rotation-reset-btn" class="button button-secondary">Reset</button>
+            <div class="section">
+                <h2>Certifications</h2>
+                <ul>
+                    <li>Certified Software Tester – KodNest Technologies</li>
+                </ul>
             </div>
         </div>
-
-        <!-- Left Rotation Section -->
-        <div class="mb-12 p-6 bg-green-50 rounded-lg shadow-md">
-            <h2 class="sub-heading">Left Rotation (RR Imbalance)</h2>
-            <p class="mb-4">
-                A Left Rotation is performed when an AVL tree becomes imbalanced on the "right side of the right child" (RR imbalance).
-                This typically occurs after inserting a node into the right subtree of the right child of an already balanced node,
-                causing the right subtree to become much taller than the left subtree.
-                The purpose is to rotate nodes counter-clockwise to bring the tree back into balance.
-            </p>
-
-            <div class="code-block" id="left-rotation-code-line">
-                <!-- Code line will be inserted here by JavaScript -->
+        <div class="right">
+            <div class="section">
+                <h2>Professional Summary</h2>
+                <p>
+                    Software QA Tester with 16+ months of experience at Accenture, testing enterprise web applications with a strong emphasis on manual regression and functional testing. Known for meticulous test documentation, planning, and collaboration in Agile teams. Reduced test cycle execution time by 15%, saving ~10 hours/month.
+                </p>
             </div>
-            <div class="explanation-box" id="left-rotation-explanation">
-                <!-- Explanation will be inserted here by JavaScript -->
+            <div class="section">
+                <h2>Tools & Technologies</h2>
+                <ul>
+                    <li>JIRA, Bugzilla</li>
+                    <li>Postman, Selenium (Basic)</li>
+                    <li>MS Excel, Google Docs</li>
+                    <li>SDLC, STLC</li>
+                </ul>
             </div>
-            <div class="svg-container" id="left-rotation-svg-container">
-                <svg id="left-rotation-svg" width="100%" height="100%"></svg>
-            </div>
-            <div class="flex justify-center mt-4">
-                <button id="left-rotation-next-btn" class="button button-primary">Next Step</button>
-                <button id="left-rotation-reset-btn" class="button button-secondary">Reset</button>
+            <div class="section">
+                <h2>Professional Experience</h2>
+                <div class="job-title">Software QA Tester</div>
+                <div class="company">Accenture, Bengaluru · Feb 2024 – Present</div>
+                <ul>
+                    <li>Executed test cases for complex web applications in Agile environment.</li>
+                    <li>Performed functional and regression testing across 6+ release cycles.</li>
+                    <li>Collaborated with developers to resolve 50+ bugs using JIRA, cutting resolution time by 30%.</li>
+                    <li>Documented test cases, results, and reports aligned to user stories.</li>
+                    <li>Reduced test redundancy and improved test cycle efficiency by 15%.</li>
+                    </ul>
             </div>
         </div>
     </div>
 
+    <!-- MODALS MOVED TO BE DIRECT CHILDREN OF BODY -->
+    <!-- The Cropping Modal -->
+    <div id="cropModal"> 
+        <div style="background: white; padding: 20px; border-radius: 8px;">
+            <img id="cropImage" style="max-width: 500px; max-height: 500px;">
+            <button id="cropAndSaveButton">Crop & Save</button>
+            <button id="cancelCropButton">Cancel</button>
+        </div>
+    </div>
+
+    <!-- The Instruction Popup Modal -->
+    <div id="instructionPopup">
+        <div class="popup-content">
+            <span class="close-button">&times;</span>
+            <h2>👋 Welcome to Your Editable Resume!</h2>
+            <p>Here's how you can easily customize your resume right here in your browser:</p>
+
+            <h3>✨ Adjusting the Blue Header's Shape:</h3>
+            <p>Notice the <strong>small yellow circles</strong> on the blue header? Think of them as magic handles!</p>
+            <ul>
+                <li>Simply <strong>click and drag</strong> these circles to reshape the blue section.</li>
+                <li>Each circle controls a different part of the header's design, letting you create your perfect look.</li>
+                <li>Your changes will be remembered for next time!</li>
+            </ul>
+
+             <h3>🖼️ Changing Your Profile Photo:</h3>
+        <p>Want to update your picture? It's super easy!</p>
+        <ul>
+            <li>Just <strong>click anywhere on your current circular profile photo</strong>.</li>
+            <li>A window will pop up, allowing you to select a new image from your computer.</li>
+            <li>**After selecting, you can crop and adjust the image within the new window that appears.**</li>
+            <li>Your new photo will instantly appear and stay there for future visits.</li>
+        </ul>
+            <p>When you're happy with your resume, you can print it! Press <strong>Ctrl + P</strong> (Windows/Linux) or <strong>Cmd + P</strong> (Mac) to open the print dialog.</p>
+
+            <button id="gotItButton" class="stylish-button">Got It!</button>
+        </div>
+    </div>
+
     <script>
-        // Node class to represent a node in the AVL tree
-        class Node {
-            constructor(value) {
-                this.value = value;
-                this.left = null;
-                this.right = null;
-                this.height = 1; // Height of the node's subtree (used in a real AVL implementation)
-            }
-        }
-
-        // --- Tree Drawing Utility ---
-        const NODE_RADIUS = 25; // Radius of the circle representing a node
-        const HORIZONTAL_SPACING = 50; // Minimum horizontal space between sibling nodes
-        const VERTICAL_SPACING = 70;  // Vertical space between levels of the tree
-
-        /**
-         * Recursively calculates the x, y coordinates and subtree width for each node.
-         * This helps in positioning nodes correctly to avoid overlaps and center the tree.
-         * @param {Node} node The current node to position.
-         * @param {number} x The current x-coordinate for the left edge of the subtree.
-         * @param {number} y The current y-coordinate (depth) for the current node.
-         * @returns {number} The total width occupied by the subtree rooted at this node.
-         */
-        function calculateNodePositions(node, x, y) {
-            if (!node) return 0;
-
-            // Calculate width of left subtree
-            let leftWidth = calculateNodePositions(node.left, x, y + VERTICAL_SPACING);
-            
-            // Set current node's x and y based on left subtree's width
-            node.x = x + leftWidth;
-            node.y = y;
-
-            // Calculate width of right subtree
-            let rightWidth = calculateNodePositions(node.right, node.x + HORIZONTAL_SPACING, y + VERTICAL_SPACING);
-
-            // Return total width of this subtree
-            return leftWidth + HORIZONTAL_SPACING + rightWidth;
-        }
-
-        /**
-         * Draws the AVL tree on the specified SVG element.
-         * It clears previous drawings, calculates positions, and then draws nodes and edges.
-         * @param {Node} root The root of the tree to draw.
-         * @param {string} svgId The ID of the SVG element where the tree will be drawn.
-         * @param {Array<number>} highlightNodes An array of node values to highlight (e.g., [20, 30]).
-         * @param {Array<string>} highlightPointers An array of pointer IDs to highlight (e.g., ['line-parentValue-childValue']).
-         */
-        function drawTree(root, svgId, highlightNodes = [], highlightPointers = []) {
-            const svg = document.getElementById(svgId);
-            if (!svg) return;
-
-            // Clear any previously drawn elements in the SVG
-            while (svg.firstChild) {
-                svg.removeChild(svg.firstChild);
-            }
-
-            if (!root) return; // If no root, nothing to draw
-
-            // Create a deep copy of the tree to add position (x, y) properties without modifying original data
-            let tempRoot = JSON.parse(JSON.stringify(root)); 
-            
-            // Calculate initial positions. Start drawing a bit lower to give space for root.
-            calculateNodePositions(tempRoot, 0, NODE_RADIUS * 2); 
-
-            // Find min/max x to determine the overall width of the tree and center it
-            let minX = Infinity, maxX = -Infinity;
-            let nodesToDraw = []; // Collect all nodes for drawing
-            let queue = [tempRoot]; // Use a queue for a breadth-first traversal to collect nodes
-            while (queue.length > 0) {
-                let node = queue.shift();
-                if (node) {
-                    nodesToDraw.push(node);
-                    minX = Math.min(minX, node.x);
-                    maxX = Math.max(maxX, node.x);
-                    if (node.left) queue.push(node.left);
-                    if (node.right) queue.push(node.right);
-                }
-            }
-
-            const svgWidth = svg.clientWidth; // Get the actual width of the SVG container
-            // Calculate offset to center the tree horizontally within the SVG container
-            const offsetX = (svgWidth - (maxX - minX)) / 2 - minX; 
-
-            // --- Draw lines (edges) first so nodes appear on top ---
-            function drawEdges(node) {
-                if (!node) return;
-
-                // Draw line to left child
-                if (node.left) {
-                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                    line.setAttribute("x1", node.x + offsetX);
-                    line.setAttribute("y1", node.y + NODE_RADIUS); // Start from bottom of parent circle
-                    line.setAttribute("x2", node.left.x + offsetX);
-                    line.setAttribute("y2", node.left.y - NODE_RADIUS); // End at top of child circle
-                    // Apply highlighting class if this pointer is in the highlight list
-                    line.setAttribute("class", `node-line ${highlightPointers.includes(`line-${node.value}-${node.left.value}`) ? 'highlight-line' : ''}`);
-                    line.setAttribute("id", `line-${node.value}-${node.left.value}`);
-                    svg.appendChild(line);
-                    drawEdges(node.left); // Recursively draw edges for left subtree
-                }
-                // Draw line to right child
-                if (node.right) {
-                    const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-                    line.setAttribute("x1", node.x + offsetX);
-                    line.setAttribute("y1", node.y + NODE_RADIUS);
-                    line.setAttribute("x2", node.right.x + offsetX);
-                    line.setAttribute("y2", node.right.y - NODE_RADIUS);
-                    // Apply highlighting class if this pointer is in the highlight list
-                    line.setAttribute("class", `node-line ${highlightPointers.includes(`line-${node.value}-${node.right.value}`) ? 'highlight-line' : ''}`);
-                    line.setAttribute("id", `line-${node.value}-${node.right.value}`);
-                    svg.appendChild(line);
-                    drawEdges(node.right); // Recursively draw edges for right subtree
-                }
-            }
-            drawEdges(tempRoot); // Start drawing edges from the temporary root
-
-            // --- Draw nodes (circles and text) ---
-            nodesToDraw.forEach(node => {
-                // Draw circle for the node
-                const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                circle.setAttribute("cx", node.x + offsetX);
-                circle.setAttribute("cy", node.y);
-                circle.setAttribute("r", NODE_RADIUS);
-                // Apply highlighting class if this node's value is in the highlight list
-                circle.setAttribute("class", `node-circle ${highlightNodes.includes(node.value) ? 'highlight-node' : ''}`);
-                circle.setAttribute("id", `node-${node.value}`);
-                svg.appendChild(circle);
-
-                // Draw text (node value)
-                const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-                text.setAttribute("x", node.x + offsetX);
-                text.setAttribute("y", node.y);
-                text.textContent = node.value;
-                // Apply highlighting class if this node's value is in the highlight list
-                text.setAttribute("class", `node-text ${highlightNodes.includes(node.value) ? 'highlight-text' : ''}`);
-                text.setAttribute("id", `text-${node.value}`);
-                svg.appendChild(text);
-            });
-        }
-
-        // --- Rotation Logic and Steps Definitions ---
-
-        // Helper function to create a deep copy of a Node structure.
-        // This is crucial because we modify the tree structure for each step's visualization
-        // without altering the original initial tree.
-        function deepCopyNode(node) {
-            if (!node) return null;
-            const newNode = new Node(node.value);
-            newNode.left = deepCopyNode(node.left);
-            newNode.right = deepCopyNode(node.right);
-            newNode.height = node.height; // Copy height as well
-            return newNode;
-        }
-
-        // Initial tree for Right Rotation (LL Imbalance demonstration)
-        // This tree is designed to be imbalanced on the left-left side.
-        //       30 (root)
-        //      /
-        //     20 (newRoot)
-        //    /
-        //   10
-        const initialRightTree = new Node(30);
-        initialRightTree.left = new Node(20);
-        initialRightTree.left.left = new Node(10);
-        // Manually setting heights for this example. In a real AVL tree, these would be calculated.
-        initialRightTree.left.left.height = 1;
-        initialRightTree.left.height = 2;
-        initialRightTree.height = 3;
-
-        // Define each step of the Right Rotation process
-        const rightRotationSteps = [
-            {
-                codeLine: "function rightRotate(root):",
-                explanation: "We are starting the right rotation process. 'root' is the node that is currently out of balance (value: 30). This imbalance is due to a new node being inserted into its left-left subtree.",
-                treeState: deepCopyNode(initialRightTree), // Show initial tree
-                highlightNodes: [30], // Highlight the root node
-                highlightPointers: []
-            },
-            {
-                codeLine: "  let newRoot = root.left;",
-                explanation: "First, we identify the 'newRoot' of this subtree. This will be the left child of our current 'root' (value: 20). This node will move up to become the new top of this section of the tree after rotation.",
-                treeState: (() => {
-                    // Tree state remains the same for drawing, just highlighting changes
-                    const tree = deepCopyNode(initialRightTree);
-                    return tree;
-                })(),
-                highlightNodes: [20], // Highlight the node that will become the new root
-                highlightPointers: ['line-30-20'] // Highlight the pointer from 30 to 20
-            },
-            {
-                codeLine: "  let tempSubtree = newRoot.right;",
-                explanation: "Next, we need to temporarily store the right child of our 'newRoot' (value: 20). This is called 'tempSubtree'. In this specific example, it's empty (null), but it's crucial for cases where this subtree exists. It will be re-attached later.",
-                treeState: (() => {
-                    const tree = deepCopyNode(initialRightTree);
-                    return tree;
-                })(),
-                highlightNodes: [20], // Still highlighting newRoot
-                highlightPointers: [] // No specific pointer to highlight for null subtree
-            },
-            {
-                codeLine: "  newRoot.right = root;",
-                explanation: "Now, we perform the main rotation step! The 'newRoot' (value: 20) takes the original 'root' (value: 30) as its new right child. Imagine 20 swinging up and 30 swinging down and to its right. This is a key pointer change!",
-                treeState: (() => {
-                    const tree = deepCopyNode(initialRightTree); // Get initial state
-                    const newRoot = tree.left; // Node 20
-                    const root = tree; // Node 30
-                    
-                    // Perform the conceptual pointer change for visualization
-                    newRoot.right = root; // 20's right now points to 30
-                    root.left = null; // Temporarily nullify 30's left for clarity of this specific pointer change
-                    
-                    return newRoot; // Return 20 as the conceptual new root for drawing this step
-                })(),
-                highlightNodes: [20, 30], // Highlight both nodes involved in the main swap
-                highlightPointers: ['line-20-30'] // Highlight the newly formed pointer from 20 to 30
-            },
-            {
-                codeLine: "  root.left = tempSubtree;",
-                explanation: "The original 'root' (value: 30) needs a new left child. We assign it the 'tempSubtree' we saved earlier. Since 'tempSubtree' was null in this example, 30's left child becomes null. If 'tempSubtree' had nodes, they would be attached here.",
-                treeState: (() => {
-                    const tree = deepCopyNode(initialRightTree);
-                    const newRoot = tree.left; // Node 20
-                    const root = tree; // Node 30
-                    const tempSubtree = newRoot.right; // This was null in our initial tree
-                    
-                    newRoot.right = root; // Re-establish 20 -> 30 link
-                    root.left = tempSubtree; // 30's left becomes null (or whatever tempSubtree was)
-                    
-                    return newRoot;
-                })(),
-                highlightNodes: [30], // Highlight 30 as its left pointer is changing
-                highlightPointers: [] // No specific line to highlight if it points to null
-            },
-            {
-                codeLine: "  // Update heights of root and newRoot",
-                explanation: "After the rotation, the heights of the affected nodes (the original 'root' (30) and the 'newRoot' (20)) need to be recalculated. This is crucial to maintain AVL properties and ensure the tree's balance factor can be correctly checked for future operations.",
-                treeState: (() => {
-                    const tree = deepCopyNode(initialRightTree);
-                    const newRoot = tree.left; // Node 20
-                    const root = tree; // Node 30
-                    const tempSubtree = newRoot.right; // null
-                    
-                    newRoot.right = root;
-                    root.left = tempSubtree;
-
-                    // Simulate height update for the new structure
-                    root.height = 1; // 30 is now a leaf (or has a smaller subtree)
-                    newRoot.height = 2; // 20 now has 10 (left) and 30 (right), so its height is 2
-                    return newRoot;
-                })(),
-                highlightNodes: [20, 30], // Highlight both nodes whose heights are updated
-                highlightPointers: []
-            },
-            {
-                codeLine: "  return newRoot;",
-                explanation: "Finally, the 'newRoot' (value: 20) is returned. This node is now the root of the balanced subtree, replacing the original 'root' (value: 30). The tree is now balanced! This new root (20) will be linked to its parent in the larger tree.",
-                treeState: (() => {
-                    const tree = deepCopyNode(initialRightTree);
-                    const newRoot = tree.left; // Node 20
-                    const root = tree; // Node 30
-                    const tempSubtree = newRoot.right; // null
-                    
-                    newRoot.right = root;
-                    root.left = tempSubtree;
-                    root.height = 1;
-                    newRoot.height = 2;
-                    return newRoot; // This is the final balanced subtree
-                })(),
-                highlightNodes: [20], // Highlight the final new root
-                highlightPointers: []
-            }
-        ];
-
-        // Initial tree for Left Rotation (RR Imbalance demonstration)
-        // This tree is designed to be imbalanced on the right-right side.
-        //   10 (root)
-        //    \
-        //     20 (newRoot)
-        //      \
-        //       30
-        const initialLeftTree = new Node(10);
-        initialLeftTree.right = new Node(20);
-        initialLeftTree.right.right = new Node(30);
-        // Manually setting heights for this example.
-        initialLeftTree.right.right.height = 1;
-        initialLeftTree.right.height = 2;
-        initialLeftTree.height = 3;
-
-        // Define each step of the Left Rotation process
-        const leftRotationSteps = [
-            {
-                codeLine: "function leftRotate(root):",
-                explanation: "We are starting the left rotation process. 'root' is the node that is currently out of balance (value: 10). This imbalance is due to a new node being inserted into its right-right subtree.",
-                treeState: deepCopyNode(initialLeftTree),
-                highlightNodes: [10],
-                highlightPointers: []
-            },
-            {
-                codeLine: "  let newRoot = root.right;",
-                explanation: "First, we identify the 'newRoot' of this subtree. This will be the right child of our current 'root' (value: 20). This node will move up to become the new top of this section of the tree after rotation.",
-                treeState: (() => {
-                    const tree = deepCopyNode(initialLeftTree);
-                    return tree;
-                })(),
-                highlightNodes: [20],
-                highlightPointers: ['line-10-20']
-            },
-            {
-                codeLine: "  let tempSubtree = newRoot.left;",
-                explanation: "Next, we need to temporarily store the left child of our 'newRoot' (value: 20). This is called 'tempSubtree'. In this specific example, it's empty (null), but it's crucial for cases where this subtree exists. It will be re-attached later.",
-                treeState: (() => {
-                    const tree = deepCopyNode(initialLeftTree);
-                    return tree;
-                })(),
-                highlightNodes: [20],
-                highlightPointers: []
-            },
-            {
-                codeLine: "  newRoot.left = root;",
-                explanation: "Now, we perform the main rotation step! The 'newRoot' (value: 20) takes the original 'root' (value: 10) as its new left child. Imagine 20 swinging up and 10 swinging down and to its left. This is a key pointer change!",
-                treeState: (() => {
-                    const tree = deepCopyNode(initialLeftTree);
-                    const newRoot = tree.right; // Node 20
-                    const root = tree; // Node 10
-                    
-                    newRoot.left = root; // 20's left now points to 10
-                    root.right = null; // Temporarily nullify 10's right for clarity
-                    
-                    return newRoot;
-                })(),
-                highlightNodes: [20, 10],
-                highlightPointers: ['line-20-10']
-            },
-            {
-                codeLine: "  root.right = tempSubtree;",
-                explanation: "The original 'root' (value: 10) needs a new right child. We assign it the 'tempSubtree' we saved earlier. Since 'tempSubtree' was null in this example, 10's right child becomes null. If 'tempSubtree' had nodes, they would be attached here.",
-                treeState: (() => {
-                    const tree = deepCopyNode(initialLeftTree);
-                    const newRoot = tree.right; // Node 20
-                    const root = tree; // Node 10
-                    const tempSubtree = newRoot.left; // null
-                    
-                    newRoot.left = root;
-                    root.right = tempSubtree; // 10's right becomes null
-                    
-                    return newRoot;
-                })(),
-                highlightNodes: [10],
-                highlightPointers: []
-            },
-            {
-                codeLine: "  // Update heights of root and newRoot",
-                explanation: "After the rotation, the heights of the affected nodes (the original 'root' (10) and the 'newRoot' (20)) need to be recalculated. This is crucial to maintain AVL properties and ensure the tree's balance factor can be correctly checked for future operations.",
-                treeState: (() => {
-                    const tree = deepCopyNode(initialLeftTree);
-                    const newRoot = tree.right; // Node 20
-                    const root = tree; // Node 10
-                    const tempSubtree = newRoot.left; // null
-                    
-                    newRoot.left = root;
-                    root.right = tempSubtree;
-
-                    // Simulate height update
-                    root.height = 1; // 10 is now a leaf
-                    newRoot.height = 2; // 20 now has 10 (left) and 30 (right), so its height is 2
-                    return newRoot;
-                })(),
-                highlightNodes: [10, 20],
-                highlightPointers: []
-            },
-            {
-                codeLine: "  return newRoot;",
-                explanation: "Finally, the 'newRoot' (value: 20) is returned. This node is now the root of the balanced subtree, replacing the original 'root' (value: 10). The tree is now balanced! This new root (20) will be linked to its parent in the larger tree.",
-                treeState: (() => {
-                    const tree = deepCopyNode(initialLeftTree);
-                    const newRoot = tree.right; // Node 20
-                    const root = tree; // Node 10
-                    const tempSubtree = newRoot.left; // null
-                    
-                    newRoot.left = root;
-                    root.right = tempSubtree;
-                    root.height = 1;
-                    newRoot.height = 2;
-                    return newRoot; // This is the final balanced subtree
-                })(),
-                highlightNodes: [20],
-                highlightPointers: []
-            }
-        ];
-
-        let currentRightStepIndex = 0; // Tracks the current step for Right Rotation
-        let currentLeftStepIndex = 0;  // Tracks the current step for Left Rotation
-
-        // --- Update Display Function ---
-
-        /**
-         * Updates the UI elements (code, explanation, tree diagram) for a given rotation type.
-         * @param {'right'|'left'} type The type of rotation ('right' or 'left').
-         */
-        function updateDisplay(type) {
-            let step, codeLineEl, explanationEl, nextBtn, resetBtn, svgId;
-            let stepsArray, currentIndex;
-
-            // Determine which rotation's data and elements to use
-            if (type === 'right') {
-                stepsArray = rightRotationSteps;
-                currentIndex = currentRightStepIndex;
-                codeLineEl = document.getElementById('right-rotation-code-line');
-                explanationEl = document.getElementById('right-rotation-explanation');
-                nextBtn = document.getElementById('right-rotation-next-btn');
-                resetBtn = document.getElementById('right-rotation-reset-btn');
-                svgId = 'right-rotation-svg';
-            } else { // type === 'left'
-                stepsArray = leftRotationSteps;
-                currentIndex = currentLeftStepIndex;
-                codeLineEl = document.getElementById('left-rotation-code-line');
-                explanationEl = document.getElementById('left-rotation-explanation');
-                nextBtn = document.getElementById('left-rotation-next-btn');
-                resetBtn = document.getElementById('left-rotation-reset-btn');
-                svgId = 'left-rotation-svg';
-            }
-
-            // Get the current step's data
-            step = stepsArray[currentIndex];
-
-            // Update text content
-            codeLineEl.textContent = step.codeLine;
-            explanationEl.textContent = step.explanation;
-
-            // Draw the tree for the current step with appropriate highlighting
-            drawTree(step.treeState, svgId, step.highlightNodes, step.highlightPointers);
-
-            // Enable/disable the "Next Step" button based on whether there are more steps
-            if (currentIndex >= stepsArray.length - 1) {
-                nextBtn.disabled = true; // Disable if at the last step
-            } else {
-                nextBtn.disabled = false; // Enable otherwise
-            }
-        }
-
-        // --- Event Listeners ---
-        // Ensure the DOM is fully loaded before trying to access elements
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize the display for both rotations when the page loads
-            updateDisplay('right');
-            updateDisplay('left');
+            // --- Get all necessary elements first ---
+            const resumeHeader = document.getElementById('resumeHeader');
+            const profilePic = document.getElementById('profilePic');
+            const imageUpload = document.getElementById('imageUpload');
 
-            // Event listener for Right Rotation "Next Step" button
-            document.getElementById('right-rotation-next-btn').addEventListener('click', () => {
-                if (currentRightStepIndex < rightRotationSteps.length - 1) {
-                    currentRightStepIndex++; // Move to the next step
-                    updateDisplay('right'); // Update display for right rotation
+            const instructionPopup = document.getElementById('instructionPopup');
+            const closeButton = document.querySelector('#instructionPopup .close-button');
+            const gotItButton = document.getElementById('gotItButton');
+            const clipPathHandles = document.querySelectorAll('.clip-path-handle'); // Select all handles
+
+
+            // --- 1. Header Clip-Path Adjustment ---
+
+            const handle1 = document.getElementById('handle1'); // 100% 85%
+            const handle2 = document.getElementById('handle2'); // 32% 65%
+            const handle3 = document.getElementById('handle3'); // 0 140px
+
+            let activeHandle = null;
+            let headerRect;
+
+            let clipPathPoints = {
+                h1: { x: 100, y: 85, type: 'percent' },
+                h2: { x: 32, y: 65, type: 'percent' },
+                h3: { x: 0, y: 140, type: 'pixel' }
+            };
+
+            // To store the Cropper.js instance
+            let cropper;
+            const cropImage = document.getElementById('cropImage'); // Image inside the modal
+            const cropModal = document.getElementById('cropModal');
+            const cropAndSaveButton = document.getElementById('cropAndSaveButton');
+            const cancelCropButton = document.getElementById('cancelCropButton');
+
+            // --- Profile Picture Upload & Cropping Logic (MODIFIED) ---
+
+            // When the profile picture is clicked, trigger the file input
+            profilePic.addEventListener('click', () => {
+                // Only allow click if popup is not active
+                if (instructionPopup.style.display === 'none') {
+                    imageUpload.click();
                 }
             });
 
-            // Event listener for Right Rotation "Reset" button
-            document.getElementById('right-rotation-reset-btn').addEventListener('click', () => {
-                currentRightStepIndex = 0; // Reset to the first step
-                updateDisplay('right'); // Update display for right rotation
-            });
+            // When a file is selected via the input
+            imageUpload.addEventListener('change', (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        // Set the image source for Cropper.js in the modal
+                        cropImage.src = e.target.result;
 
-            // Event listener for Left Rotation "Next Step" button
-            document.getElementById('left-rotation-next-btn').addEventListener('click', () => {
-                if (currentLeftStepIndex < leftRotationSteps.length - 1) {
-                    currentLeftStepIndex++; // Move to the next step
-                    updateDisplay('left'); // Update display for left rotation
+                        // Show the cropping modal
+                        cropModal.style.display = 'flex'; // This will make it visible and apply CSS styles
+
+                        // Initialize Cropper.js
+                        // Destroy previous instance if it exists before creating a new one
+                        if (cropper) {
+                            cropper.destroy();
+                        }
+                        cropper = new Cropper(cropImage, {
+                            aspectRatio: 1, // For a circular profile pic (1:1 ratio)
+                            viewMode: 1, // Restrict the crop box to not exceed the canvas
+                            movable: true,
+                            zoomable: true,
+                            rotatable: false,
+                            scalable: false,
+                            // Optional: Set a min crop box size if desired
+                            minCropBoxWidth: 50,
+                            minCropBoxHeight: 50,
+                            // Add more options for fine-tuning the cropping experience
+                        });
+                    };
+                    reader.readAsDataURL(file);
                 }
             });
 
-            // Event listener for Left Rotation "Reset" button
-            document.getElementById('left-rotation-reset-btn').addEventListener('click', () => {
-                currentLeftStepIndex = 0; // Reset to the first step
-                updateDisplay('left'); // Update display for left rotation
+            // Event listener for the "Crop & Save" button
+            cropAndSaveButton.addEventListener('click', () => {
+                if (cropper) {
+                    // Get the cropped image data as a Data URL
+                    const croppedCanvas = cropper.getCroppedCanvas({
+                        width: 300, // Desired output width
+                        height: 300, // Desired output height
+                        fillColor: '#fff', // Fill transparent areas with white (optional)
+                    });
+                    const croppedImageUrl = croppedCanvas.toDataURL('image/png'); // Or 'image/jpeg' for smaller files
+
+                    // Set the cropped image as the background for your profilePic div
+                    profilePic.style.backgroundImage = `url('${croppedImageUrl}')`;
+                    localStorage.setItem('profilePicUrl', croppedImageUrl); // Save the cropped image
+
+                    // Hide the cropping modal and destroy the cropper instance
+                    cropModal.style.display = 'none';
+                    cropper.destroy();
+                    cropper = null; // Clear the instance
+                }
             });
-        });
 
-        // Optional: Handle window resize to redraw SVG if necessary for responsiveness.
-        // This ensures the tree remains centered and scaled correctly if the browser window changes size.
-        window.addEventListener('resize', () => {
-            updateDisplay('right');
-            updateDisplay('left');
-        });
+            // Event listener for the "Cancel" button
+            cancelCropButton.addEventListener('click', () => {
+                cropModal.style.display = 'none';
+                if (cropper) {
+                    cropper.destroy();
+                    cropper = null;
+                }
+                imageUpload.value = ''; // Clear the file input so selecting the same file again triggers 'change'
+            });
 
+            // Load saved profile picture from localStorage on page load
+            const savedProfilePic = localStorage.getItem('profilePicUrl');
+            if (savedProfilePic) {
+                profilePic.style.backgroundImage = `url('${savedProfilePic}')`;
+            }
+
+            // --- End of Profile Picture Upload & Cropping Logic ---
+
+
+            function updateClipPath() {
+                const point1 = `${clipPathPoints.h1.x}% ${clipPathPoints.h1.y}%`;
+                const point2 = `${clipPathPoints.h2.x}% ${clipPathPoints.h2.y}%`;
+                const point3 = `0 ${clipPathPoints.h3.y}px`;
+
+                resumeHeader.style.clipPath = `polygon(0 0, 100% 0, ${point1}, ${point2}, ${point3})`;
+                localStorage.setItem('resumeClipPath', JSON.stringify(clipPathPoints));
+                // Only position handles if they are meant to be visible (i.e., popup is not active)
+                if (instructionPopup.style.display === 'none') {
+                    positionHandles();
+                }
+            }
+
+            function positionHandles() {
+                headerRect = resumeHeader.getBoundingClientRect();
+
+                handle1.style.left = '100%';
+                handle1.style.top = `${clipPathPoints.h1.y}%`;
+
+                handle2.style.left = `${clipPathPoints.h2.x}%`;
+                handle2.style.top = `${clipPathPoints.h2.y}%`;
+
+                handle3.style.left = '0px';
+                handle3.style.top = `${clipPathPoints.h3.y}px`;
+            }
+
+            // Load saved clip-path from localStorage
+            const savedClipPath = localStorage.getItem('resumeClipPath');
+            if (savedClipPath) {
+                clipPathPoints = JSON.parse(savedClipPath);
+                // updateClipPath will be called later if popup is not shown
+            }
+
+
+            const handles = [handle1, handle2, handle3];
+
+            handles.forEach(handle => {
+                handle.addEventListener('mousedown', (e) => {
+                    activeHandle = e.target;
+                    headerRect = resumeHeader.getBoundingClientRect();
+                    document.addEventListener('mousemove', onMouseMove);
+                    document.addEventListener('mouseup', onMouseUp);
+                    e.preventDefault();
+                });
+            });
+
+            function onMouseMove(e) {
+                if (!activeHandle) return;
+
+                const mouseX = e.clientX - headerRect.left;
+                const mouseY = e.clientY - headerRect.top;
+
+                const percentX = (mouseX / headerRect.width) * 100;
+                const percentY = (mouseY / headerRect.height) * 100;
+
+                if (activeHandle === handle1) {
+                    clipPathPoints.h1.y = Math.max(0, Math.min(100, percentY));
+                } else if (activeHandle === handle2) {
+                    clipPathPoints.h2.x = Math.max(0, Math.min(100, percentX));
+                    clipPathPoints.h2.y = Math.max(0, Math.min(100, percentY));
+                } else if (activeHandle === handle3) {
+                    clipPathPoints.h3.y = Math.max(0, Math.min(headerRect.height, mouseY));
+                }
+
+                updateClipPath();
+            }
+
+            function onMouseUp() {
+                activeHandle = null;
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            }
+
+            window.addEventListener('resize', () => {
+                headerRect = resumeHeader.getBoundingClientRect();
+                // Only reposition handles if they are visible
+                if (instructionPopup.style.display === 'none') {
+                    positionHandles();
+                }
+            });
+
+            // --- Popup Logic ---
+
+            function showPopup() {
+                instructionPopup.style.display = 'flex';
+                // Hide editing elements while popup is visible
+                clipPathHandles.forEach(handle => handle.style.display = 'none'); // Explicitly hide handles
+                profilePic.style.pointerEvents = 'none'; // Disable photo click
+                handles.forEach(handle => handle.style.pointerEvents = 'none'); // Disable handle drag
+            }
+
+            function hidePopup() {
+                instructionPopup.style.display = 'none';
+                localStorage.setItem('popupShown', 'true'); // Mark as seen
+
+                // Show and re-enable editing elements after popup is dismissed
+                clipPathHandles.forEach(handle => handle.style.display = 'block'); // Explicitly show handles
+                profilePic.style.pointerEvents = 'auto'; // Re-enable photo click
+                handles.forEach(handle => handle.style.pointerEvents = 'auto'); // Re-enable handle drag
+
+                // Ensure handles are correctly positioned after showing
+                positionHandles();
+                updateClipPath(); // Apply the loaded clip-path or default one
+            }
+
+            // Event Listeners for closing the popup
+            closeButton.addEventListener('click', hidePopup);
+            gotItButton.addEventListener('click', hidePopup);
+
+            // Initial check: Show popup if it hasn't been shown before
+            if (localStorage.getItem('popupShown') !== 'true') {
+                showPopup();
+            } else {
+                // If popup has been shown, ensure handles and editing are active from the start
+                clipPathHandles.forEach(handle => handle.style.display = 'block'); // Explicitly show handles
+                profilePic.style.pointerEvents = 'auto';
+                handles.forEach(handle => handle.style.pointerEvents = 'auto');
+                positionHandles(); // Position them on load
+                updateClipPath(); // Apply the loaded clip-path or default one
+            }
+        });
     </script>
 </body>
 </html>
