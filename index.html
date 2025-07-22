@@ -37,6 +37,8 @@
             position: relative;
             text-align: left;
             animation: fadeInScale 0.3s ease-out forwards; /* Simple animation */
+            max-height: 80vh; /* Fixed height for scrollable content */
+            overflow-y: auto; /* Enable vertical scrolling */
         }
 
         @keyframes fadeInScale {
@@ -159,7 +161,7 @@
                 page-break-inside: avoid;
             }
             /* Hide handles and file input during print */
-            .clip-path-handle, #imageUpload {
+            .clip-path-handle, #imageUpload, .add-item-button, .remove-item-button {
                 display: none !important;
             }
         }
@@ -262,7 +264,21 @@
             border: 4px solid white;
             box-shadow: 0 2px 8px rgba(0,0,0,0.15);
             cursor: pointer; /* Indicate it's clickable */
+            overflow: hidden; /* Crucial to contain the absolute positioned input */
         }
+
+        /* New styles for the image upload input */
+        #imageUpload {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0; /* Make it invisible */
+            cursor: pointer; /* Keep cursor to indicate clickability */
+            z-index: 5; /* Ensure it's above the profile pic but below handles if any overlap */
+        }
+
 
         ul {
             padding-left: 18px;
@@ -271,6 +287,8 @@
         }
         ul li {
             margin-bottom: 6px;
+            position: relative; /* For positioning remove button */
+            padding-right: 25px; /* Space for remove button */
         }
         p {
             font-size: 14px;
@@ -286,6 +304,66 @@
             margin-bottom: 6px;
             color: #666;
         }
+
+        /* Styles for editable content */
+        [contenteditable="true"]:focus {
+            outline: 1px dashed #1976d2;
+            background-color: #e6f0fa;
+            color: #333; /* Added: Make text dark on focus for readability */
+        }
+        [contenteditable="true"]:hover {
+            background-color: #f7faff;
+        }
+
+        /* Styles for add/remove buttons */
+        .add-item-button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 10px;
+            display: block; /* Ensures it's on its own line */
+            width: fit-content;
+            transition: background-color 0.2s;
+        }
+        .add-item-button:hover {
+            background-color: #218838;
+        }
+
+        .remove-item-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            line-height: 1;
+            text-align: center;
+            cursor: pointer;
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            transition: background-color 0.2s;
+            opacity: 0.7; /* Make it subtle until hover */
+        }
+        .remove-item-button:hover {
+            background-color: #c82333;
+            opacity: 1;
+        }
+        /* Hide remove button by default, show on li hover */
+        li:not(:focus-within) .remove-item-button {
+            display: none;
+        }
+        li:hover .remove-item-button,
+        li:focus-within .remove-item-button {
+            display: inline-block;
+        }
+
 
         /* Additional CSS for Cropper Modal for better appearance */
         #cropModal {
@@ -344,9 +422,12 @@
 </head>
 <body>
     <div class="header" id="resumeHeader">
-        <h1>Anu Prasannakumar</h1>
-        <div class="profile-pic" id="profilePic"></div>
-        <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+        <h1 id="resumeName" contenteditable="true">Anu Prasannakumar</h1>
+        <div class="profile-pic" id="profilePic">
+            <!-- imageUpload is now inside profile-pic and styled to be transparent -->
+            <input type="file" id="imageUpload" accept="image/*">
+        </div>
+        <!-- Removed: <input type="file" id="imageUpload" accept="image/*" style="display: none;"> -->
 
         <img id="imageToCrop" style="max-width: 100%; display: none;">
 
@@ -358,64 +439,71 @@
     <div class="container">
         <div class="left">
             <div class="section">
-                <h2>Contact</h2>
-                <p>📍 Bengaluru, Karnataka</p>
-                <p>📞 +91-7736385086</p>
-                <p>✉️ anubee3120@gmail.com</p>
-                <p>🎂 3 January 2000</p>
+                <h2 id="contactHeading" contenteditable="true">Contact</h2>
+                <p id="contactLocation" contenteditable="true">📍 Bengaluru, Karnataka</p>
+                <p id="contactPhone" contenteditable="true">📞 +91-7736385086</p>
+                <p id="contactEmail" contenteditable="true">✉️ anubee3120@gmail.com</p>
+                <p id="contactDOB" contenteditable="true">🎂 3 January 2000</p>
             </div>
             <div class="section">
-                <h2>Skills</h2>
-                <ul>
-                    <li>Manual, Regression, Smoke Testing</li>
-                    <li>JIRA, Bug Tracking</li>
-                    <li>Agile/Scrum Process</li>
-                    <li>Test Documentation</li>
-                    <li>SQL (Basic)</li>
-                    <li>Core Java</li>
-                    <li>Familiar with AWS fundamentals and commonly used services </li>
-                    <li>Familiar with Linux OS</li>
-                    <li>Fundamental Understanding of Networking </li>
+                <h2 id="skillsHeading" contenteditable="true">Skills</h2>
+                <ul id="skillsList">
+                    <li contenteditable="true">Manual, Regression, Smoke Testing <button class="remove-item-button">x</button></li>
+                    <li contenteditable="true">JIRA, Bug Tracking <button class="remove-item-button">x</button></li>
+                    <li contenteditable="true">Agile/Scrum Process <button class="remove-item-button">x</button></li>
+                    <li contenteditable="true">Test Documentation <button class="remove-item-button">x</button></li>
+                    <li contenteditable="true">SQL (Basic) <button class="remove-item-button">x</button></li>
+                    <li contenteditable="true">Core Java <button class="remove-item-button">x</button></li>
+                    <li contenteditable="true">Familiar with AWS fundamentals and commonly used services <button class="remove-item-button">x</button></li>
+                    <li contenteditable="true">Familiar with Linux OS <button class="remove-item-button">x</button></li>
+                    <li contenteditable="true">Fundamental Understanding of Networking <button class="remove-item-button">x</button></li>
                 </ul>
+                <button class="add-item-button" data-target-list="skillsList">Add Skill</button>
             </div>
             <div class="section">
-                <h2>Education</h2>
-                <p><strong>B.E. in Computer Science</strong><br>Anna University, Chennai – 2022</p>
+                <h2 id="educationHeading" contenteditable="true">Education</h2>
+                <p id="educationDegree" contenteditable="true"><strong>B.E. in Computer Science</strong><br>Anna University, Chennai – 2022</p>
             </div>
             <div class="section">
-                <h2>Certifications</h2>
-                <ul>
-                    <li>Certified Software Tester – KodNest Technologies</li>
+                <h2 id="certificationsHeading" contenteditable="true">Certifications</h2>
+                <ul id="certificationsList">
+                    <li contenteditable="true">Certified Software Tester – KodNest Technologies <button class="remove-item-button">x</button></li>
                 </ul>
+                <button class="add-item-button" data-target-list="certificationsList">Add Certification</button>
             </div>
         </div>
         <div class="right">
             <div class="section">
-                <h2>Professional Summary</h2>
-                <p>
+                <h2 id="summaryHeading" contenteditable="true">Professional Summary</h2>
+                <p id="summaryContent" contenteditable="true">
                     Software QA Tester with 16+ months of experience at Accenture, testing enterprise web applications with a strong emphasis on manual regression and functional testing. Known for meticulous test documentation, planning, and collaboration in Agile teams. Reduced test cycle execution time by 15%, saving ~10 hours/month.
                 </p>
             </div>
             <div class="section">
-                <h2>Tools & Technologies</h2>
-                <ul>
-                    <li>JIRA, Bugzilla</li>
-                    <li>Postman, Selenium (Basic)</li>
-                    <li>MS Excel, Google Docs</li>
-                    <li>SDLC, STLC</li>
+                <h2 id="toolsHeading" contenteditable="true">Tools & Technologies</h2>
+                <ul id="toolsList">
+                    <li contenteditable="true">JIRA, Bugzilla <button class="remove-item-button">x</button></li>
+                    <li contenteditable="true">Postman, Selenium (Basic) <button class="remove-item-button">x</button></li>
+                    <li contenteditable="true">MS Excel, Google Docs <button class="remove-item-button">x</button></li>
+                    <li contenteditable="true">SDLC, STLC <button class="remove-item-button">x</button></li>
                 </ul>
+                <button class="add-item-button" data-target-list="toolsList">Add Tool/Technology</button>
             </div>
             <div class="section">
-                <h2>Professional Experience</h2>
-                <div class="job-title">Software QA Tester</div>
-                <div class="company">Accenture, Bengaluru · Feb 2024 – Present</div>
-                <ul>
-                    <li>Executed test cases for complex web applications in Agile environment.</li>
-                    <li>Performed functional and regression testing across 6+ release cycles.</li>
-                    <li>Collaborated with developers to resolve 50+ bugs using JIRA, cutting resolution time by 30%.</li>
-                    <li>Documented test cases, results, and reports aligned to user stories.</li>
-                    <li>Reduced test redundancy and improved test cycle efficiency by 15%.</li>
+                <h2 id="experienceHeading" contenteditable="true">Professional Experience</h2>
+                <div class="job-entry"> <!-- New wrapper for job entries if you want to add/remove whole jobs -->
+                    <div class="job-title" contenteditable="true">Software QA Tester</div>
+                    <div class="company" contenteditable="true">Accenture, Bengaluru · Feb 2024 – Present</div>
+                    <ul id="experienceList">
+                        <li contenteditable="true">Executed test cases for complex web applications in Agile environment. <button class="remove-item-button">x</button></li>
+                        <li contenteditable="true">Performed functional and regression testing across 6+ release cycles. <button class="remove-item-button">x</button></li>
+                        <li contenteditable="true">Collaborated with developers to resolve 50+ bugs using JIRA, cutting resolution time by 30%. <button class="remove-item-button">x</button></li>
+                        <li contenteditable="true">Documented test cases, results, and reports aligned to user stories. <button class="remove-item-button">x</button></li>
+                        <li contenteditable="true">Reduced test redundancy and improved test cycle efficiency by 15%. <button class="remove-item-button">x</button></li>
                     </ul>
+                    <button class="add-item-button" data-target-list="experienceList">Add Responsibility</button>
+                </div>
+                <!-- You could add another 'job-entry' div here if you wanted a button to add whole job sections -->
             </div>
         </div>
     </div>
@@ -434,7 +522,7 @@
     <div id="instructionPopup">
         <div class="popup-content">
             <span class="close-button">&times;</span>
-            <h2>👋 Welcome to Your Editable Resume!</h2>
+            <h2>👋 Welcome to Your Editable Resume!(Scroll to read full)</h2>
             <p>Here's how you can easily customize your resume right here in your browser:</p>
 
             <h3>✨ Adjusting the Blue Header's Shape:</h3>
@@ -445,14 +533,31 @@
                 <li>Your changes will be remembered for next time!</li>
             </ul>
 
-             <h3>🖼️ Changing Your Profile Photo:</h3>
-        <p>Want to update your picture? It's super easy!</p>
-        <ul>
-            <li>Just <strong>click anywhere on your current circular profile photo</strong>.</li>
-            <li>A window will pop up, allowing you to select a new image from your computer.</li>
-            <li>**After selecting, you can crop and adjust the image within the new window that appears.**</li>
-            <li>Your new photo will instantly appear and stay there for future visits.</li>
-        </ul>
+            <h3>🖼️ Changing Your Profile Photo:</h3>
+            <p>Want to update your picture? It's super easy!</p>
+            <ul>
+                <li>Just <strong>click anywhere on your current circular profile photo</strong>.</li>
+                <li>A window will pop up, allowing you to select a new image from your computer.</li>
+                <li>**After selecting, you can crop and adjust the image within the new window that appears.**</li>
+                <li>Your new photo will instantly appear and stay there for future visits.</li>
+            </ul>
+
+            <h3>✏️ Editing Any Text:</h3>
+            <p>Almost every piece of text on your resume is now editable!</p>
+            <ul>
+                <li>Just <strong>click directly on any text</strong> you want to change (like your name, headings, or paragraphs).</li>
+                <li>You can then type, delete, or modify the text just like in a document editor.</li>
+                <li>All your text changes will be saved automatically as you type.</li>
+            </ul>
+
+            <h3>➕➖ Managing Lists:</h3>
+            <p>For sections like "Skills" or "Certifications," you can easily add or remove items:</p>
+            <ul>
+                <li>Look for an "Add" button below each list to **add a new item**.</li>
+                <li>To **remove an existing item**, simply hover your mouse over it, and a small "x" will appear. Click the "x" to delete that item.</li>
+                <li>These list changes are also saved automatically.</li>
+            </ul>
+
             <p>When you're happy with your resume, you can print it! Press <strong>Ctrl + P</strong> (Windows/Linux) or <strong>Cmd + P</strong> (Mac) to open the print dialog.</p>
 
             <button id="gotItButton" class="stylish-button">Got It!</button>
@@ -461,15 +566,30 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // --- Get all necessary elements first ---
+            // --- Utility Functions ---
+            // Debounce function to limit how often a function is called
+            function debounce(func, delay) {
+                let timeout;
+                return function(...args) {
+                    const context = this;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(context, args), delay);
+                };
+            }
+
+            // --- Get all necessary elements ---
             const resumeHeader = document.getElementById('resumeHeader');
             const profilePic = document.getElementById('profilePic');
-            const imageUpload = document.getElementById('imageUpload');
+            let imageUpload = document.getElementById('imageUpload'); // Changed to let
 
             const instructionPopup = document.getElementById('instructionPopup');
             const closeButton = document.querySelector('#instructionPopup .close-button');
             const gotItButton = document.getElementById('gotItButton');
             const clipPathHandles = document.querySelectorAll('.clip-path-handle'); // Select all handles
+
+            // All editable content elements
+            const editableElements = document.querySelectorAll('[contenteditable="true"]');
+            const addButtons = document.querySelectorAll('.add-item-button');
 
 
             // --- 1. Header Clip-Path Adjustment ---
@@ -480,104 +600,14 @@
 
             let activeHandle = null;
             let headerRect;
+            let initialMouseX, initialMouseY; // For drag calculations
+            let initialHandleX, initialHandleY; // For drag calculations
 
             let clipPathPoints = {
                 h1: { x: 100, y: 85, type: 'percent' },
                 h2: { x: 32, y: 65, type: 'percent' },
                 h3: { x: 0, y: 140, type: 'pixel' }
             };
-
-            // To store the Cropper.js instance
-            let cropper;
-            const cropImage = document.getElementById('cropImage'); // Image inside the modal
-            const cropModal = document.getElementById('cropModal');
-            const cropAndSaveButton = document.getElementById('cropAndSaveButton');
-            const cancelCropButton = document.getElementById('cancelCropButton');
-
-            // --- Profile Picture Upload & Cropping Logic (MODIFIED) ---
-
-            // When the profile picture is clicked, trigger the file input
-            profilePic.addEventListener('click', () => {
-                // Only allow click if popup is not active
-                if (instructionPopup.style.display === 'none') {
-                    imageUpload.click();
-                }
-            });
-
-            // When a file is selected via the input
-            imageUpload.addEventListener('change', (event) => {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        // Set the image source for Cropper.js in the modal
-                        cropImage.src = e.target.result;
-
-                        // Show the cropping modal
-                        cropModal.style.display = 'flex'; // This will make it visible and apply CSS styles
-
-                        // Initialize Cropper.js
-                        // Destroy previous instance if it exists before creating a new one
-                        if (cropper) {
-                            cropper.destroy();
-                        }
-                        cropper = new Cropper(cropImage, {
-                            aspectRatio: 1, // For a circular profile pic (1:1 ratio)
-                            viewMode: 1, // Restrict the crop box to not exceed the canvas
-                            movable: true,
-                            zoomable: true,
-                            rotatable: false,
-                            scalable: false,
-                            // Optional: Set a min crop box size if desired
-                            minCropBoxWidth: 50,
-                            minCropBoxHeight: 50,
-                            // Add more options for fine-tuning the cropping experience
-                        });
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
-
-            // Event listener for the "Crop & Save" button
-            cropAndSaveButton.addEventListener('click', () => {
-                if (cropper) {
-                    // Get the cropped image data as a Data URL
-                    const croppedCanvas = cropper.getCroppedCanvas({
-                        width: 300, // Desired output width
-                        height: 300, // Desired output height
-                        fillColor: '#fff', // Fill transparent areas with white (optional)
-                    });
-                    const croppedImageUrl = croppedCanvas.toDataURL('image/png'); // Or 'image/jpeg' for smaller files
-
-                    // Set the cropped image as the background for your profilePic div
-                    profilePic.style.backgroundImage = `url('${croppedImageUrl}')`;
-                    localStorage.setItem('profilePicUrl', croppedImageUrl); // Save the cropped image
-
-                    // Hide the cropping modal and destroy the cropper instance
-                    cropModal.style.display = 'none';
-                    cropper.destroy();
-                    cropper = null; // Clear the instance
-                }
-            });
-
-            // Event listener for the "Cancel" button
-            cancelCropButton.addEventListener('click', () => {
-                cropModal.style.display = 'none';
-                if (cropper) {
-                    cropper.destroy();
-                    cropper = null;
-                }
-                imageUpload.value = ''; // Clear the file input so selecting the same file again triggers 'change'
-            });
-
-            // Load saved profile picture from localStorage on page load
-            const savedProfilePic = localStorage.getItem('profilePicUrl');
-            if (savedProfilePic) {
-                profilePic.style.backgroundImage = `url('${savedProfilePic}')`;
-            }
-
-            // --- End of Profile Picture Upload & Cropping Logic ---
-
 
             function updateClipPath() {
                 const point1 = `${clipPathPoints.h1.x}% ${clipPathPoints.h1.y}%`;
@@ -595,14 +625,22 @@
             function positionHandles() {
                 headerRect = resumeHeader.getBoundingClientRect();
 
+                // Position handle1 (100% X, Y%)
+                // Convert percentage Y to pixel Y relative to header
+                const handle1Ypx = (clipPathPoints.h1.y / 100) * headerRect.height;
                 handle1.style.left = '100%';
-                handle1.style.top = `${clipPathPoints.h1.y}%`;
+                handle1.style.top = `${handle1Ypx}px`; // Set in pixels for consistent dragging
 
-                handle2.style.left = `${clipPathPoints.h2.x}%`;
-                handle2.style.top = `${clipPathPoints.h2.y}%`;
 
+                // Position handle2 (X%, Y%)
+                const handle2Xpx = (clipPathPoints.h2.x / 100) * headerRect.width;
+                const handle2Ypx = (clipPathPoints.h2.y / 100) * headerRect.height;
+                handle2.style.left = `${handle2Xpx}px`; // Set in pixels
+                handle2.style.top = `${handle2Ypx}px`; // Set in pixels
+
+                // Position handle3 (0px X, Ypx)
                 handle3.style.left = '0px';
-                handle3.style.top = `${clipPathPoints.h3.y}px`;
+                handle3.style.top = `${clipPathPoints.h3.y}px`; // Already in pixels
             }
 
             // Load saved clip-path from localStorage
@@ -619,31 +657,67 @@
                 handle.addEventListener('mousedown', (e) => {
                     activeHandle = e.target;
                     headerRect = resumeHeader.getBoundingClientRect();
+
+                    // Store initial mouse position
+                    initialMouseX = e.clientX;
+                    initialMouseY = e.clientY;
+
+                    // Store initial handle position (adjusting for the -50% transform)
+                    // Get current computed style to get pixel values relative to header
+                    const computedStyle = window.getComputedStyle(activeHandle);
+                    // We need the actual pixel position of the handle's top-left corner relative to its parent (header)
+                    initialHandleX = parseFloat(computedStyle.left);
+                    initialHandleY = parseFloat(computedStyle.top);
+
                     document.addEventListener('mousemove', onMouseMove);
                     document.addEventListener('mouseup', onMouseUp);
-                    e.preventDefault();
+                    e.preventDefault(); // Prevent default drag behavior
                 });
             });
 
             function onMouseMove(e) {
                 if (!activeHandle) return;
 
-                const mouseX = e.clientX - headerRect.left;
-                const mouseY = e.clientY - headerRect.top;
+                const deltaX = e.clientX - initialMouseX;
+                const deltaY = e.clientY - initialMouseY;
 
-                const percentX = (mouseX / headerRect.width) * 100;
-                const percentY = (mouseY / headerRect.height) * 100;
+                let newHandleX = initialHandleX + deltaX;
+                let newHandleY = initialHandleY + deltaY;
+
+                // Clamp newHandleX and newHandleY within header bounds
+                // Account for the handle's own size and centering transform
+                const handleWidth = activeHandle.offsetWidth;
+                const handleHeight = activeHandle.offsetHeight;
+
+                // Clamp X position
+                newHandleX = Math.max(0, Math.min(headerRect.width, newHandleX));
+                // Clamp Y position
+                newHandleY = Math.max(0, Math.min(headerRect.height, newHandleY));
+
+                // Update handle's visual position directly
+                activeHandle.style.left = `${newHandleX}px`;
+                activeHandle.style.top = `${newHandleY}px`;
+
+
+                // Update clipPathPoints based on new handle pixel positions
+                // Convert pixel positions back to percentages for clip-path
+                const percentX = (newHandleX / headerRect.width) * 100;
+                const percentY = (newHandleY / headerRect.height) * 100;
 
                 if (activeHandle === handle1) {
+                    // handle1 is always at 100% X, only Y changes
                     clipPathPoints.h1.y = Math.max(0, Math.min(100, percentY));
+                    activeHandle.style.left = '100%'; // Ensure it sticks to the right edge visually
                 } else if (activeHandle === handle2) {
                     clipPathPoints.h2.x = Math.max(0, Math.min(100, percentX));
                     clipPathPoints.h2.y = Math.max(0, Math.min(100, percentY));
                 } else if (activeHandle === handle3) {
-                    clipPathPoints.h3.y = Math.max(0, Math.min(headerRect.height, mouseY));
+                    // handle3 is always at 0px X, only Y changes
+                    clipPathPoints.h3.y = Math.max(0, Math.min(headerRect.height, newHandleY));
+                    activeHandle.style.left = '0px'; // Ensure it sticks to the left edge visually
                 }
 
-                updateClipPath();
+                updateClipPath(); // This will save to localStorage and apply the clip-path
             }
 
             function onMouseUp() {
@@ -660,6 +734,216 @@
                 }
             });
 
+            // --- 2. Profile Picture Upload & Cropping Logic ---
+
+            let cropper; // To store the Cropper instance
+            const cropImage = document.getElementById('cropImage'); // Image inside the modal
+            const cropModal = document.getElementById('cropModal');
+            const cropAndSaveButton = document.getElementById('cropAndSaveButton');
+            const cancelCropButton = document.getElementById('cancelCropButton');
+
+            // Function to attach the change listener to the file input
+            function attachImageUploadListener() {
+                imageUpload.addEventListener('change', handleImageUploadChange);
+                console.log('Image upload change listener attached.');
+            }
+
+            // Handler for when a file is selected via the input
+            function handleImageUploadChange(event) {
+                console.log('Image upload change event fired.');
+                const file = event.target.files[0];
+                if (file) {
+                    console.log('File selected:', file.name);
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        cropImage.src = e.target.result;
+                        console.log('Image source set for cropping.');
+                        cropModal.style.display = 'flex';
+                        console.log('Crop modal displayed.');
+
+                        if (cropper) {
+                            cropper.destroy();
+                            console.log('Previous cropper instance destroyed.');
+                        }
+                        cropper = new Cropper(cropImage, {
+                            aspectRatio: 1,
+                            viewMode: 1,
+                            movable: true,
+                            zoomable: true,
+                            rotatable: false,
+                            scalable: false,
+                            minCropBoxWidth: 50,
+                            minCropBoxHeight: 50,
+                        });
+                        console.log('Cropper initialized.');
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    console.log('No file selected.');
+                }
+            }
+
+            // Event listener for the "Crop & Save" button
+            cropAndSaveButton.addEventListener('click', () => {
+                console.log('Crop & Save button clicked.');
+                if (cropper) {
+                    const croppedCanvas = cropper.getCroppedCanvas({
+                        width: 300,
+                        height: 300,
+                        fillColor: '#fff',
+                    });
+                    const croppedImageUrl = croppedCanvas.toDataURL('image/png');
+                    console.log('Image cropped and Data URL generated.');
+
+                    profilePic.style.backgroundImage = `url('${croppedImageUrl}')`;
+                    localStorage.setItem('profilePicUrl', croppedImageUrl); // RESTORED: Save to localStorage
+                    console.log('Profile pic updated and saved to localStorage.');
+
+                    cropModal.style.display = 'none';
+                    cropper.destroy();
+                    cropper = null;
+                    console.log('Cropper modal hidden and instance destroyed.');
+
+                    // CRITICAL FIX: Replace the file input element to force change event next time
+                    // This is still needed because the 'change' event on file input only fires if the VALUE changes.
+                    // Replacing the element effectively resets its value.
+                    const oldImageUpload = imageUpload;
+                    const newImageUpload = oldImageUpload.cloneNode(true); // Clone with its attributes
+                    oldImageUpload.parentNode.replaceChild(newImageUpload, oldImageUpload); // Replace it
+                    imageUpload = newImageUpload; // Update the reference to the new element
+                    attachImageUploadListener(); // Re-attach the listener to the new element
+                    console.log('File input replaced and listener re-attached.');
+                }
+            });
+
+            // Event listener for the "Cancel" button
+            cancelCropButton.addEventListener('click', () => {
+                console.log('Cancel button clicked.');
+                cropModal.style.display = 'none';
+                if (cropper) {
+                    cropper.destroy();
+                    cropper = null;
+                }
+                // CRITICAL FIX: Replace the file input element to force change event next time
+                const oldImageUpload = imageUpload;
+                const newImageUpload = oldImageUpload.cloneNode(true);
+                oldImageUpload.parentNode.replaceChild(newImageUpload, oldImageUpload);
+                imageUpload = newImageUpload;
+                attachImageUploadListener();
+                console.log('Cancel: File input replaced and listener re-attached.');
+            });
+
+            // RESTORED: Load saved profile picture from localStorage on page load
+            const savedProfilePic = localStorage.getItem('profilePicUrl');
+            if (savedProfilePic) {
+                profilePic.style.backgroundImage = `url('${savedProfilePic}')`;
+                console.log('Loaded saved profile pic from localStorage.');
+            } else {
+                console.log('No saved profile pic found in localStorage. Using default.');
+            }
+
+            // Initial attachment of the listener when the page loads
+            attachImageUploadListener();
+
+
+            // --- End of Profile Picture Upload & Cropping Logic ---
+
+
+            // --- 3. Full Content Editable & Saving ---
+
+            // Function to save content of a single element
+            const saveElementContent = debounce((element) => {
+                if (element.id) { // Only save elements with an ID
+                    localStorage.setItem(`resume_content_${element.id}`, element.innerHTML);
+                    // console.log(`Saved content for ${element.id}`);
+                }
+            }, 500); // Save after 500ms of no typing
+
+            // Attach input event listeners to all editable elements for saving
+            editableElements.forEach(element => {
+                element.addEventListener('input', () => saveElementContent(element));
+            });
+
+            // Function to load all saved content
+            function loadAllContent() {
+                editableElements.forEach(element => {
+                    if (element.id) {
+                        const savedContent = localStorage.getItem(`resume_content_${element.id}`);
+                        if (savedContent !== null) { // Check for null, not just falsy, to allow empty strings
+                            element.innerHTML = savedContent;
+                        }
+                    }
+                });
+
+                // Load list contents separately as they are dynamically managed
+                document.querySelectorAll('ul[id$="List"]').forEach(ul => {
+                    const savedListContent = localStorage.getItem(`resume_content_${ul.id}`);
+                    if (savedListContent !== null) {
+                        ul.innerHTML = savedListContent;
+                        // After loading, re-attach remove button listeners
+                        attachRemoveButtonListeners(ul);
+                    }
+                });
+                console.log('All content loaded from localStorage.');
+            }
+
+            // --- 4. Add/Remove List Item Functionality ---
+
+            // Function to attach remove button listeners to a given UL
+            function attachRemoveButtonListeners(ulElement) {
+                ulElement.querySelectorAll('.remove-item-button').forEach(button => {
+                    // Remove existing listeners to prevent duplicates
+                    button.removeEventListener('click', handleRemoveItem);
+                    button.addEventListener('click', handleRemoveItem);
+                });
+            }
+
+            // Handler for removing an item
+            function handleRemoveItem(event) {
+                const listItem = event.target.closest('li');
+                if (listItem) {
+                    const listId = listItem.closest('ul').id;
+                    listItem.remove();
+                    // Save the updated list content
+                    saveElementContent(document.getElementById(listId));
+                    console.log('List item removed and list saved.');
+                }
+            }
+
+            // Attach listeners to initial remove buttons
+            document.querySelectorAll('.remove-item-button').forEach(button => {
+                button.addEventListener('click', handleRemoveItem);
+            });
+
+            // Attach listeners to Add Item buttons
+            addButtons.forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const targetListId = event.target.dataset.targetList;
+                    const targetList = document.getElementById(targetListId);
+                    if (targetList) {
+                        const newItem = document.createElement('li');
+                        newItem.setAttribute('contenteditable', 'true');
+                        newItem.textContent = 'New Item'; // Default text for new item
+
+                        const removeButton = document.createElement('button');
+                        removeButton.className = 'remove-item-button';
+                        removeButton.textContent = 'x';
+                        removeButton.addEventListener('click', handleRemoveItem); // Attach listener immediately
+
+                        newItem.appendChild(removeButton);
+                        targetList.appendChild(newItem);
+
+                        // Save the updated list content
+                        saveElementContent(targetList);
+                        console.log('New list item added and list saved.');
+
+                        // Focus on the new item for immediate editing
+                        newItem.focus();
+                    }
+                });
+            });
+
+
             // --- Popup Logic ---
 
             function showPopup() {
@@ -668,20 +952,27 @@
                 clipPathHandles.forEach(handle => handle.style.display = 'none'); // Explicitly hide handles
                 profilePic.style.pointerEvents = 'none'; // Disable photo click
                 handles.forEach(handle => handle.style.pointerEvents = 'none'); // Disable handle drag
+                // Hide add/remove buttons during popup
+                document.querySelectorAll('.add-item-button, .remove-item-button').forEach(btn => btn.style.display = 'none');
+                console.log('Instruction popup shown. Editing elements hidden.');
             }
 
             function hidePopup() {
                 instructionPopup.style.display = 'none';
                 localStorage.setItem('popupShown', 'true'); // Mark as seen
+                console.log('Instruction popup hidden. PopupShown set to true.');
 
                 // Show and re-enable editing elements after popup is dismissed
                 clipPathHandles.forEach(handle => handle.style.display = 'block'); // Explicitly show handles
                 profilePic.style.pointerEvents = 'auto'; // Re-enable photo click
                 handles.forEach(handle => handle.style.pointerEvents = 'auto'); // Re-enable handle drag
+                // Show add/remove buttons after popup
+                document.querySelectorAll('.add-item-button, .remove-item-button').forEach(btn => btn.style.display = 'block');
 
                 // Ensure handles are correctly positioned after showing
                 positionHandles();
                 updateClipPath(); // Apply the loaded clip-path or default one
+                console.log('Editing elements shown and re-enabled.');
             }
 
             // Event Listeners for closing the popup
@@ -696,9 +987,15 @@
                 clipPathHandles.forEach(handle => handle.style.display = 'block'); // Explicitly show handles
                 profilePic.style.pointerEvents = 'auto';
                 handles.forEach(handle => handle.style.pointerEvents = 'auto');
+                document.querySelectorAll('.add-item-button, .remove-item-button').forEach(btn => btn.style.display = 'block');
+
                 positionHandles(); // Position them on load
                 updateClipPath(); // Apply the loaded clip-path or default one
+                console.log('Popup already shown. Editing elements active from start.');
             }
+
+            // Load all content after all setup is complete
+            loadAllContent();
         });
     </script>
 </body>
