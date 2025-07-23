@@ -164,6 +164,15 @@
             .clip-path-handle, #imageUpload, .add-item-button, .remove-item-button {
                 display: none !important;
             }
+            /* Add this rule to hide the profile pic if the checkbox is checked */
+   .hide-photo-for-print #profilePic {
+        display: none !important;
+    }
+
+    /* NEW/MODIFIED RULE: Always hide the container with the checkbox during print */
+    #printOptionContainer {
+        display: none !important;
+    }
         }
         body {
             margin: 0;
@@ -422,11 +431,16 @@
 </head>
 <body>
     <div class="header" id="resumeHeader">
-        <h1 id="resumeName" contenteditable="true">Anu Prasannakumar</h1>
+        <h1 id="resumeName" contenteditable="true">Your Name</h1>
         <div class="profile-pic" id="profilePic">
             <!-- imageUpload is now inside profile-pic and styled to be transparent -->
             <input type="file" id="imageUpload" accept="image/*">
         </div>
+        <div id="printOptionContainer" style="position: absolute; top: 130px; right: 40px; z-index: 10; display: flex; align-items: center; color: white;">
+    <input type="checkbox" id="hidePhotoOnPrint" style="margin-right: 5px;">
+    <label for="hidePhotoOnPrint" style="font-size: 13px;">Hide photo on print</label>
+</div>
+</div>
         <!-- Removed: <input type="file" id="imageUpload" accept="image/*" style="display: none;"> -->
 
         <img id="imageToCrop" style="max-width: 100%; display: none;">
@@ -441,9 +455,9 @@
             <div class="section">
                 <h2 id="contactHeading" contenteditable="true">Contact</h2>
                 <p id="contactLocation" contenteditable="true">📍 Bengaluru, Karnataka</p>
-                <p id="contactPhone" contenteditable="true">📞 +91-7736385086</p>
-                <p id="contactEmail" contenteditable="true">✉️ anubee3120@gmail.com</p>
-                <p id="contactDOB" contenteditable="true">🎂 3 January 2000</p>
+                <p id="contactPhone" contenteditable="true">📞 +91-8888888888</p>
+                <p id="contactEmail" contenteditable="true">✉️ mail@example.com</p>
+                <p id="contactDOB" contenteditable="true">🎂 1 January 2000</p>
             </div>
             <div class="section">
                 <h2 id="skillsHeading" contenteditable="true">Skills</h2>
@@ -522,47 +536,31 @@
     <div id="instructionPopup">
         <div class="popup-content">
             <span class="close-button">&times;</span>
-            <h2>👋 Welcome to Your Editable Resume!(Scroll to read full)</h2>
-            <p>Here's how you can easily customize your resume right here in your browser:</p>
+            <h2>👋 Welcome to Your Editable Resume!</h2>
+            <p>Here's a quick guide to customizing your resume:</p>
 
-            <h3>✨ Adjusting the Blue Header's Shape:</h3>
-            <p>Notice the <strong>small yellow circles</strong> on the blue header? Think of them as magic handles!</p>
+            <h3>✨ Customize Shape & Photo:</h3>
             <ul>
-                <li>Simply <strong>click and drag</strong> these circles to reshape the blue section.</li>
-                <li>Each circle controls a different part of the header's design, letting you create your perfect look.</li>
-                <li>Your changes will be remembered for next time!</li>
+                <li>Drag the <strong>yellow circles</strong> on the blue header to reshape it.</li>
+                <li>Click your **profile photo** to upload and crop a new picture.</li>
+                <li>Check **'Hide photo on print'** below your photo to exclude it from printed and PDF versions.</li>
             </ul>
 
-            <h3>🖼️ Changing Your Profile Photo:</h3>
-            <p>Want to update your picture? It's super easy!</p>
+            <h3>✏️ Edit Text & Lists:</h3>
             <ul>
-                <li>Just <strong>click anywhere on your current circular profile photo</strong>.</li>
-                <li>A window will pop up, allowing you to select a new image from your computer.</li>
-                <li>**After selecting, you can crop and adjust the image within the new window that appears.**</li>
-                <li>Your new photo will instantly appear and stay there for future visits.</li>
+                <li>Click any **text** (name, headings, paragraphs) to edit directly.</li>
+                <li>Use the **'Add' button** below lists to add new items.</li>
+                <li>Hover over a list item and click the **'x'** to remove it.</li>
             </ul>
+            <p>All your changes are saved automatically.</p>
 
-            <h3>✏️ Editing Any Text:</h3>
-            <p>Almost every piece of text on your resume is now editable!</p>
-            <ul>
-                <li>Just <strong>click directly on any text</strong> you want to change (like your name, headings, or paragraphs).</li>
-                <li>You can then type, delete, or modify the text just like in a document editor.</li>
-                <li>All your text changes will be saved automatically as you type.</li>
-            </ul>
-
-            <h3>➕➖ Managing Lists:</h3>
-            <p>For sections like "Skills" or "Certifications," you can easily add or remove items:</p>
-            <ul>
-                <li>Look for an "Add" button below each list to **add a new item**.</li>
-                <li>To **remove an existing item**, simply hover your mouse over it, and a small "x" will appear. Click the "x" to delete that item.</li>
-                <li>These list changes are also saved automatically.</li>
-            </ul>
-
-            <p>When you're happy with your resume, you can print it! Press <strong>Ctrl + P</strong> (Windows/Linux) or <strong>Cmd + P</strong> (Mac) to open the print dialog.</p>
+            <h3>🖨️ Export & Print:</h3>
+            <p>When ready, use **Ctrl+P / Cmd+P** to print, or click the **'Export as PDF'** button at the bottom right of the screen.</p>
 
             <button id="gotItButton" class="stylish-button">Got It!</button>
         </div>
     </div>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -604,9 +602,9 @@
             let initialHandleX, initialHandleY; // For drag calculations
 
             let clipPathPoints = {
-                h1: { x: 100, y: 85, type: 'percent' },
-                h2: { x: 32, y: 65, type: 'percent' },
-                h3: { x: 0, y: 140, type: 'pixel' }
+                h1: { x: 100, y: 85.4659, type: 'percent' }, // Update y for h1
+                h2: { x: 32.0842, y: 100, type: 'percent' }, // Update x and y for h2
+                h3: { x: 0, y: 140.889, type: 'pixel' } // Update y for h3
             };
 
             function updateClipPath() {
@@ -996,6 +994,33 @@
 
             // Load all content after all setup is complete
             loadAllContent();
+             const hidePhotoCheckbox = document.getElementById('hidePhotoOnPrint');
+    const hidePhotoCheckboxContainer = hidePhotoCheckbox.closest('div'); // Get the parent div
+
+    // Function to apply/remove the print class based on checkbox state
+    function applyPrintHideClass() {
+        if (hidePhotoCheckbox.checked) {
+            document.body.classList.add('hide-photo-for-print');
+            
+        } else {
+            document.body.classList.remove('hide-photo-for-print');
+            
+        }
+        // Save state to localStorage
+        localStorage.setItem('hidePhotoOnPrintState', hidePhotoCheckbox.checked);
+    }
+
+    // Add event listener to the checkbox
+    hidePhotoCheckbox.addEventListener('change', applyPrintHideClass);
+
+    // On page load, load the saved state and apply the class
+    const savedHidePhotoState = localStorage.getItem('hidePhotoOnPrintState');
+    if (savedHidePhotoState === 'true') {
+        hidePhotoCheckbox.checked = true;
+    } else {
+        hidePhotoCheckbox.checked = false;
+    }
+    applyPrintHideClass(); // Apply the class immediately based on loaded state
         });
     </script>
 </body>
